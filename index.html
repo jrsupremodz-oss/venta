@@ -13,7 +13,6 @@
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     
     <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiQm9kZWdhRXhwcmVzcyBWRVBubyIsInNob3J0X25hbWUiOiJCb2RlZ2FFeHByZXNzIiwic3RhcnRfdXJsIjoiLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMwZjE3MmEiLCJ0aGVtZV9jb2xvciI6IiMxMGI5ODEifQ==">
-    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%2233%22 fill=%22%23ffd700%22/><rect y=%2233%22 width=%22100%22 height=%2234%22 fill=%22%2300247d%22/><rect y=%2267%22 width=%22100%22 height=%2233%22 fill=%22%23cf142b%22/><text x=%2250%22 y=%2265%22 font-size=%2260%22 font-weight=%22bold%22 fill=%22white%22 text-anchor=%22middle%22 font-family=%22sans-serif%22>$</text></svg>">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
@@ -55,23 +54,20 @@
 </head>
 <body class="antialiased min-h-screen flex flex-col transition-colors duration-300 overflow-x-hidden" id="bodyRoot">
 
-    <!-- Toast de Notificación de Copiado Global -->
+    <!-- Toast de Notificación Global de Copiado -->
     <div id="copyToast" class="fixed top-6 left-1/2 -translate-x-1/2 bg-emerald-500 text-black font-extrabold px-5 py-3 rounded-2xl shadow-2xl z-[10000] flex items-center space-x-2 transition-all duration-300 opacity-0 -translate-y-10 pointer-events-none">
         <i class="fa-solid fa-circle-check text-xl"></i>
         <span id="toastMsg" class="text-sm">¡Copiado con éxito!</span>
     </div>
 
-    <!-- Input oculto para compatibilidad universal de copiado -->
+    <!-- Textarea oculto para compatibilidad universal de copiado -->
     <textarea id="hiddenCopyInput" class="fixed top-0 left-0 w-1 h-1 opacity-0 pointer-events-none" tabIndex="-1"></textarea>
 
-    <!-- ========================================== -->
-    <!-- PANTALLA DE ACTIVACIÓN INICIAL (BLOQUEO)   -->
-    <!-- ========================================== -->
+    <!-- PANTALLA DE ACTIVACIÓN INICIAL -->
     <div id="activationScreen" class="fixed inset-0 z-[9999] bg-[#030712] flex items-center justify-center p-4 hidden">
         <div class="relative w-full max-w-md">
             <div class="absolute -top-20 -left-20 w-64 h-64 bg-emerald-600/20 rounded-full blur-3xl"></div>
             <div class="absolute -bottom-20 -right-20 w-64 h-64 bg-sky-600/20 rounded-full blur-3xl"></div>
-            
             <div class="bg-[#0f172a] border border-[#1e293b] rounded-3xl p-8 shadow-2xl relative z-10 glow-effect text-[#f8fafc]">
                 <div class="text-center mb-8">
                     <div class="w-20 h-20 bg-emerald-600/10 rounded-2xl mx-auto flex items-center justify-center border border-emerald-500/30 mb-4 shadow-lg shadow-emerald-600/20">
@@ -80,40 +76,27 @@
                     <h2 class="text-2xl font-extrabold mb-2">Activación Requerida</h2>
                     <p class="text-sm text-slate-400">Ingrese su código de licencia para desbloquear el sistema POS PRO.</p>
                 </div>
-
                 <div class="space-y-5">
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">Nombre del Negocio / Registro</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fa-solid fa-store text-slate-500"></i></div>
-                            <input type="text" id="actClientName" placeholder="Ej. Inversiones JM" class="w-full pl-10 p-3.5 rounded-xl bg-[#1e293b] border border-[#334155] text-white focus:border-emerald-500 focus:outline-none transition">
-                        </div>
+                        <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">Nombre del Negocio</label>
+                        <input type="text" id="actClientName" placeholder="Ej. Inversiones JM" class="w-full p-3.5 rounded-xl bg-[#1e293b] border border-[#334155] text-white focus:border-emerald-500 focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider">Código de Activación</label>
                         <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"><i class="fa-solid fa-key text-slate-500"></i></div>
-                            <input type="password" id="actCode" placeholder="XXXX-XXXX-XXXX" class="w-full pl-10 p-3.5 rounded-xl bg-[#1e293b] border border-[#334155] text-white focus:border-emerald-500 focus:outline-none transition font-mono tracking-widest uppercase">
+                            <input type="password" id="actCode" placeholder="XXXX-XXXX-XXXX" class="w-full p-3.5 rounded-xl bg-[#1e293b] border border-[#334155] text-white focus:border-emerald-500 focus:outline-none font-mono tracking-widest uppercase">
                             <button onclick="togglePasswordVisibility('actCode')" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-white"><i class="fa-regular fa-eye"></i></button>
                         </div>
                     </div>
-                    
-                    <button onclick="processActivation()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-emerald-600/30 transition text-sm uppercase tracking-wider mt-2">
-                        Verificar y Activar
-                    </button>
+                    <button onclick="processActivation()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg transition text-sm uppercase tracking-wider">Verificar y Activar</button>
                 </div>
-                <div class="mt-6 text-center text-xs text-slate-500">BodegaExpress VE Pro &copy; 2026.</div>
             </div>
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- PANTALLA DE COBRO MENSUAL (SUSCRIPCIÓN)    -->
-    <!-- ========================================== -->
+    <!-- PANTALLA DE COBRO MENSUAL -->
     <div id="monthlyBillingScreen" class="fixed inset-0 z-[9998] bg-[#030712]/95 backdrop-blur-xl flex items-center justify-center p-4 hidden">
         <div class="relative w-full max-w-md">
-            <div class="absolute -top-10 -left-10 w-40 h-40 bg-amber-500/20 rounded-full blur-3xl"></div>
-            
             <div class="bg-[#0f172a] border border-amber-500/30 rounded-3xl p-6 md:p-8 shadow-2xl relative z-10 glow-effect-warn text-[#f8fafc]">
                 <div class="text-center mb-6">
                     <div class="w-16 h-16 bg-amber-500/10 rounded-2xl mx-auto flex items-center justify-center border border-amber-500/30 mb-4 shadow-lg shadow-amber-500/20">
@@ -122,174 +105,132 @@
                     <h2 class="text-xl font-extrabold mb-1">Renovación de Licencia</h2>
                     <p class="text-xs text-slate-400">Tu tiempo de suscripción ha culminado. Renueva para seguir usando el sistema.</p>
                 </div>
-
                 <div class="space-y-4">
                     <div class="flex justify-between items-center bg-[#1e293b] border border-emerald-500/30 p-4 rounded-xl">
                         <div>
                            <div class="text-[10px] text-emerald-500 font-bold uppercase tracking-wider mb-1">Monto a pagar</div>
                            <div class="text-2xl font-extrabold text-white">$2.99 <span class="text-xs font-normal text-slate-400">/ mes</span></div>
-                           <div class="text-sm font-semibold text-emerald-400 mt-1">Bs. <span id="billingAmountBs">...</span> <span class="text-[10px] text-slate-400 font-normal">(Tasa BCV)</span></div>
+                           <div class="text-sm font-semibold text-emerald-400 mt-1">Bs. <span id="billingAmountBs">...</span></div>
                         </div>
-                        <button onclick="copyBillingAmount(this)" class="h-12 w-12 bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/50 text-emerald-400 rounded-xl flex items-center justify-center transition cursor-pointer" title="Copiar Monto en Bs">
-                            <i class="fa-regular fa-copy text-lg pointer-events-none"></i>
-                        </button>
+                        <button onclick="copyBillingAmount(this)" class="h-12 w-12 bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/50 text-emerald-400 rounded-xl flex items-center justify-center transition cursor-pointer"><i class="fa-regular fa-copy text-lg pointer-events-none"></i></button>
                     </div>
-
                     <div class="bg-[#1e293b] p-4 rounded-xl border border-[#334155] relative text-sm">
-                        <button onclick="copyPagoMovilData(this)" class="absolute top-3 right-3 text-sky-400 hover:text-sky-300 transition flex items-center space-x-1 bg-sky-400/10 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer" title="Copiar todo">
-                            <i class="fa-regular fa-copy pointer-events-none"></i> <span class="pointer-events-none">Copiar Datos</span>
-                        </button>
-                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Datos de Pago Móvil</h4>
+                        <button onclick="copyPagoMovilData(this)" class="absolute top-3 right-3 text-sky-400 hover:text-sky-300 transition flex items-center space-x-1 bg-sky-400/10 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer"><i class="fa-regular fa-copy pointer-events-none"></i> <span>Copiar</span></button>
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Pago Móvil BNC</h4>
                         <div class="space-y-1.5 text-[13px]">
-                            <div class="flex justify-between"><span class="text-slate-400">Banco:</span> <span class="font-bold">BNC</span></div>
                             <div class="flex justify-between"><span class="text-slate-400">Cédula:</span> <span class="font-bold">21271099</span></div>
                             <div class="flex justify-between"><span class="text-slate-400">Teléfono:</span> <span class="font-bold">0416-9485195</span></div>
                         </div>
                     </div>
-                    
-                    <button onclick="confirmPaymentAndUnlock()" class="w-full bg-[#25D366] hover:bg-[#1ebe57] text-white font-bold py-4 rounded-xl shadow-lg shadow-[#25D366]/30 transition text-sm uppercase tracking-wider flex items-center justify-center space-x-2 mt-2 cursor-pointer">
-                        <i class="fa-brands fa-whatsapp text-lg"></i>
-                        <span>Enviar Comprobante</span>
+                    <button onclick="confirmPaymentAndUnlock()" class="w-full bg-[#25D366] hover:bg-[#1ebe57] text-white font-bold py-4 rounded-xl shadow-lg transition text-sm uppercase tracking-wider flex items-center justify-center space-x-2 cursor-pointer">
+                        <i class="fa-brands fa-whatsapp text-lg"></i> <span>Enviar Comprobante</span>
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Admin Auth (Para entrar al panel secreto) -->
+    <!-- Modal Admin Auth -->
     <div id="adminAuthModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md hidden p-4">
         <div class="app-modal border rounded-2xl p-6 max-w-sm w-full mx-auto shadow-2xl">
-            <div class="text-center mb-4">
-                <i class="fa-solid fa-user-shield text-3xl text-rose-500 mb-2"></i>
-                <h3 class="text-lg font-bold">Acceso Administrativo</h3>
-                <p class="text-xs text-slate-400">Ingrese la Llave Maestra</p>
-            </div>
-            <input type="password" id="adminMasterKeyInput" placeholder="Llave Maestra" class="w-full p-3 rounded-xl app-input border text-center font-mono tracking-wider mb-4 focus:outline-none focus:border-rose-500">
+            <div class="text-center mb-4"><i class="fa-solid fa-user-shield text-3xl text-rose-500 mb-2"></i><h3 class="text-lg font-bold">Llave Maestra</h3></div>
+            <input type="password" id="adminMasterKeyInput" placeholder="Clave" class="w-full p-3 rounded-xl app-input border text-center font-mono tracking-wider mb-4 focus:outline-none">
             <div class="flex justify-end space-x-3">
-                <button onclick="document.getElementById('adminAuthModal').classList.add('hidden')" class="px-4 py-2 text-sm font-semibold rounded-xl transition app-btn-secondary">Cancelar</button>
-                <button onclick="verifyAdminAccess()" class="px-5 py-2 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-500 rounded-xl transition shadow-lg shadow-rose-600/20">Acceder</button>
+                <button onclick="document.getElementById('adminAuthModal').classList.add('hidden')" class="px-4 py-2 text-sm font-semibold rounded-xl app-btn-secondary">Cancelar</button>
+                <button onclick="verifyAdminAccess()" class="px-5 py-2 text-sm font-semibold text-white bg-rose-600 hover:bg-rose-500 rounded-xl">Acceder</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Global de Alertas y Confirmaciones -->
+    <!-- Modal Alertas -->
     <div id="customModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden p-4">
         <div class="app-modal border rounded-2xl p-6 max-w-sm w-full mx-auto shadow-2xl">
             <div id="modalIcon" class="w-12 h-12 rounded-full flex items-center justify-center mb-4 text-xl"></div>
             <h3 id="modalTitle" class="text-lg font-bold mb-2"></h3>
             <p id="modalMessage" class="text-sm text-slate-500 dark:text-slate-400 mb-6"></p>
             <div class="flex justify-end space-x-3">
-                <button id="modalCancelBtn" onclick="closeModal(false)" class="hidden px-4 py-2 text-sm font-semibold rounded-xl transition app-btn-secondary">Cancelar</button>
-                <button id="modalConfirmBtn" onclick="closeModal(true)" class="px-5 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition shadow-lg shadow-emerald-600/20">Aceptar</button>
+                <button id="modalCancelBtn" onclick="closeModal(false)" class="hidden px-4 py-2 text-sm font-semibold rounded-xl app-btn-secondary">Cancelar</button>
+                <button id="modalConfirmBtn" onclick="closeModal(true)" class="px-5 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl">Aceptar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Factura Compartible -->
+    <!-- Modal Factura -->
     <div id="invoiceModal" class="fixed inset-0 z-[95] flex items-center justify-center bg-black/90 backdrop-blur-md hidden p-4">
         <div class="app-modal border rounded-2xl p-6 max-w-md w-full mx-auto shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="text-center pb-3 border-b border-slate-200 dark:border-slate-800">
-                <h3 id="invStoreName" class="font-extrabold text-lg text-emerald-600 dark:text-emerald-400">BodegaExpress VE</h3>
-                <p id="invStoreRif" class="text-xs text-slate-500 dark:text-slate-400">RIF: J-50123456-8</p>
-                <p id="invStoreAddress" class="text-xs text-slate-500 dark:text-slate-400">Caracas, Venezuela</p>
+                <h3 id="invStoreName" class="font-extrabold text-lg text-emerald-600">BodegaExpress VE</h3>
+                <p id="invStoreRif" class="text-xs text-slate-400">RIF: J-50123456-8</p>
             </div>
-            <div class="space-y-1 text-xs text-slate-500 dark:text-slate-400">
-                <div class="flex justify-between"><span id="invNumber">Factura: V-1001</span> <span id="invDate">12/08/2026 12:00</span></div>
+            <div class="space-y-1 text-xs text-slate-400">
+                <div class="flex justify-between"><span id="invNumber">Factura: V-1001</span> <span id="invDate">12/08/2026</span></div>
                 <div class="flex justify-between"><span id="invClient">Cliente: General</span> <span id="invRateType">Tasa: BCV</span></div>
             </div>
-            <div class="border-t border-b border-slate-200 dark:border-slate-800 py-2">
+            <div class="border-t border-b border-slate-800 py-2">
                 <table class="w-full text-xs">
-                    <thead>
-                        <tr class="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
-                            <th class="pb-1">Cant/Peso</th>
-                            <th class="pb-1">Producto</th>
-                            <th class="pb-1 text-right">Total ($)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="invItemsList" class="divide-y divide-slate-200 dark:divide-slate-800/60"></tbody>
+                    <thead><tr class="text-left text-slate-400 border-b border-slate-800"><th class="pb-1">Cant</th><th class="pb-1">Producto</th><th class="pb-1 text-right">Total ($)</th></tr></thead>
+                    <tbody id="invItemsList" class="divide-y divide-slate-800"></tbody>
                 </table>
             </div>
             <div class="space-y-1 text-xs pt-1">
-                <div class="flex justify-between font-bold text-sm pt-1"><span>Total USD:</span> <span id="invTotalUsd">$0.00</span></div>
-                <div class="flex justify-between font-extrabold text-base text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 p-2 rounded-xl border border-emerald-200 dark:border-emerald-800/40"><span>Total VES:</span> <span id="invTotalBs">Bs. 0.00</span></div>
+                <div class="flex justify-between font-bold text-sm"><span>Total USD:</span> <span id="invTotalUsd">$0.00</span></div>
+                <div class="flex justify-between font-extrabold text-base text-emerald-400 bg-emerald-950/40 p-2 rounded-xl"><span>Total VES:</span> <span id="invTotalBs">Bs. 0.00</span></div>
             </div>
             <div class="flex space-x-2 pt-2">
-                <button onclick="shareInvoice()" class="w-1/2 bg-sky-600 hover:bg-sky-500 text-white font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-1"><i class="fa-solid fa-share-nodes"></i> <span>Compartir / Imprimir</span></button>
-                <button onclick="closeInvoiceModal()" class="w-1/2 app-btn-secondary font-bold py-2.5 rounded-xl text-xs transition">Cerrar</button>
+                <button onclick="shareInvoice()" class="w-1/2 bg-sky-600 hover:bg-sky-500 text-white font-bold py-2.5 rounded-xl text-xs">Imprimir</button>
+                <button onclick="closeInvoiceModal()" class="w-1/2 app-btn-secondary font-bold py-2.5 rounded-xl text-xs">Cerrar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Escáner Profesional Web -->
-    <div id="scannerModal" class="fixed inset-0 z-[90] flex items-center justify-center bg-black/95 backdrop-blur-md hidden p-2 sm:p-4">
-        <div class="app-modal border rounded-2xl p-4 max-w-lg w-full mx-auto shadow-2xl relative flex flex-col h-[85vh] sm:h-[80vh] space-y-4">
+    <!-- Escáner QR/Barras -->
+    <div id="scannerModal" class="fixed inset-0 z-[90] flex items-center justify-center bg-black/95 backdrop-blur-md hidden p-2">
+        <div class="app-modal border rounded-2xl p-4 max-w-lg w-full mx-auto shadow-2xl relative flex flex-col h-[85vh] space-y-4">
             <div class="flex justify-between items-center shrink-0">
                 <div class="flex items-center space-x-2">
-                    <h3 class="text-lg font-bold flex items-center">
-                        <i class="fa-solid fa-barcode mr-2 text-emerald-500"></i> Escáner Pro
-                    </h3>
-                    <select id="cameraSelect" onchange="changeCameraDevice()" class="app-input text-xs font-bold px-2 py-1.5 rounded-lg border focus:outline-none max-w-[150px] truncate">
-                        <option value="">Cargando cámaras...</option>
-                    </select>
+                    <h3 class="text-lg font-bold flex items-center"><i class="fa-solid fa-barcode mr-2 text-emerald-500"></i> Escáner Pro</h3>
+                    <select id="cameraSelect" onchange="changeCameraDevice()" class="app-input text-xs font-bold px-2 py-1.5 rounded-lg border max-w-[150px]"><option value="">Cargando...</option></select>
                 </div>
                 <button onclick="stopScanner()" class="text-slate-400 hover:text-slate-200 text-2xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="relative bg-black rounded-xl overflow-hidden flex-1 flex items-center justify-center w-full shadow-inner border border-slate-800">
+            <div class="relative bg-black rounded-xl overflow-hidden flex-1 flex items-center justify-center w-full">
                 <div id="reader" class="w-full h-full"></div>
-                <div id="scannerStatusBadge" class="absolute top-4 left-4 bg-black/70 text-emerald-400 text-xs font-bold px-3 py-1.5 rounded-lg backdrop-blur-sm z-10 shadow-lg shadow-black/50">Iniciando óptica...</div>
+                <div id="scannerStatusBadge" class="absolute top-4 left-4 bg-black/70 text-emerald-400 text-xs font-bold px-3 py-1.5 rounded-lg z-10 shadow-lg">Iniciando óptica...</div>
             </div>
             <div class="flex items-center justify-between shrink-0 pt-2">
-                <button id="torchBtn" onclick="toggleTorch()" class="bg-amber-600/20 text-amber-500 hover:bg-amber-600/30 px-5 py-3 rounded-xl text-sm font-bold transition border border-amber-500/30 flex items-center space-x-2">
-                    <i class="fa-solid fa-bolt"></i> <span id="torchLabel">Flash: OFF</span>
-                </button>
-                <button onclick="stopScanner()" class="bg-rose-600/20 text-rose-500 hover:bg-rose-600/30 px-6 py-3 rounded-xl text-sm font-bold transition border border-rose-500/30">Cancelar</button>
+                <button id="torchBtn" onclick="toggleTorch()" class="bg-amber-600/20 text-amber-500 px-5 py-3 rounded-xl text-sm font-bold border border-amber-500/30 flex items-center space-x-2"><i class="fa-solid fa-bolt"></i> <span id="torchLabel">Flash: OFF</span></button>
+                <button onclick="stopScanner()" class="bg-rose-600/20 text-rose-500 px-6 py-3 rounded-xl text-sm font-bold border border-rose-500/30">Cancelar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Entrada por Peso -->
+    <!-- Modal de Peso -->
     <div id="weightModal" class="fixed inset-0 z-[95] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden p-4">
         <div class="app-modal border rounded-2xl p-6 max-w-sm w-full mx-auto shadow-2xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
-                <h3 id="weightModalTitle" class="text-base font-bold">Producto por Peso</h3>
-                <button onclick="closeWeightModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3"><h3 id="weightModalTitle" class="text-base font-bold">Producto por Peso</h3><button onclick="closeWeightModal()" class="text-slate-400"><i class="fa-solid fa-xmark"></i></button></div>
             <div class="space-y-3">
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Método de ingreso:</label>
-                    <select id="weightInputType" onchange="toggleWeightInputFields()" class="w-full p-2.5 rounded-xl app-input border text-sm focus:outline-none">
-                        <option value="kg">1. Kilos (Ej: 0.750 kg)</option>
-                        <option value="usd">2. Dólares exactos ($)</option>
-                        <option value="bs">3. Bolívares exactos (Bs)</option>
-                    </select>
-                </div>
-                <div>
-                    <label id="weightValueLabel" class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Ingrese Kilos:</label>
-                    <input type="number" step="0.001" id="weightInputValue" placeholder="1.000" class="w-full p-3 rounded-xl app-input border text-base font-bold text-emerald-600 dark:text-emerald-400 focus:outline-none">
-                </div>
+                <select id="weightInputType" onchange="toggleWeightInputFields()" class="w-full p-2.5 rounded-xl app-input border text-sm"><option value="kg">Kilos (Ej: 0.750)</option><option value="usd">Dólares exactos ($)</option><option value="bs">Bolívares exactos (Bs)</option></select>
+                <input type="number" step="0.001" id="weightInputValue" placeholder="1.000" class="w-full p-3 rounded-xl app-input border text-base font-bold text-emerald-400">
             </div>
             <div class="flex space-x-3 pt-2">
-                <button onclick="closeWeightModal()" class="w-1/2 app-btn-secondary font-semibold py-3 rounded-xl text-sm border">Cancelar</button>
-                <button onclick="confirmWeightProduct()" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-sm shadow-lg">Agregar</button>
+                <button onclick="closeWeightModal()" class="w-1/2 app-btn-secondary py-3 rounded-xl text-sm">Cancelar</button>
+                <button onclick="confirmWeightProduct()" class="w-1/2 bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm">Agregar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Creación Rápida de Cliente -->
+    <!-- Modal Cliente Rápido -->
     <div id="quickClientModal" class="fixed inset-0 z-[95] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden p-4">
         <div class="app-modal border rounded-2xl p-6 max-w-sm w-full mx-auto shadow-2xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
-                <h3 class="text-base font-bold">Nuevo Cliente Rápido</h3>
-                <button onclick="closeQuickClientModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3"><h3 class="text-base font-bold">Nuevo Cliente Rápido</h3><button onclick="closeQuickClientModal()" class="text-slate-400"><i class="fa-solid fa-xmark"></i></button></div>
             <div class="space-y-3">
-                <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Cédula o RIF:</label><input type="text" id="qcDoc" placeholder="V-12345678" class="w-full p-2.5 rounded-xl app-input border text-sm focus:outline-none"></div>
-                <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Nombre o Razón Social:</label><input type="text" id="qcName" placeholder="Juan Pérez" class="w-full p-2.5 rounded-xl app-input border text-sm focus:outline-none"></div>
-                <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Teléfono:</label><input type="text" id="qcPhone" placeholder="0412-0000000" class="w-full p-2.5 rounded-xl app-input border text-sm focus:outline-none"></div>
+                <input type="text" id="qcDoc" placeholder="Cédula o RIF" class="w-full p-2.5 rounded-xl app-input border text-sm">
+                <input type="text" id="qcName" placeholder="Nombre completo" class="w-full p-2.5 rounded-xl app-input border text-sm">
+                <input type="text" id="qcPhone" placeholder="Teléfono" class="w-full p-2.5 rounded-xl app-input border text-sm">
             </div>
             <div class="flex space-x-3 pt-2">
-                <button onclick="closeQuickClientModal()" class="w-1/2 app-btn-secondary font-semibold py-3 rounded-xl text-sm border">Cancelar</button>
-                <button onclick="saveQuickClient()" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-sm shadow-lg">Guardar</button>
+                <button onclick="closeQuickClientModal()" class="w-1/2 app-btn-secondary py-3 rounded-xl text-sm">Cancelar</button>
+                <button onclick="saveQuickClient()" class="w-1/2 bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm">Guardar</button>
             </div>
         </div>
     </div>
@@ -297,103 +238,76 @@
     <!-- Modal Producto -->
     <div id="productModal" class="fixed inset-0 z-[50] flex items-center justify-center bg-black/70 backdrop-blur-sm hidden p-4">
         <div class="app-modal border rounded-2xl p-6 max-w-md w-full mx-auto shadow-2xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
-                <h3 id="productModalTitle" class="text-lg font-bold">Nuevo Producto</h3>
-                <button onclick="closeProductModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3"><h3 id="productModalTitle" class="text-lg font-bold">Nuevo Producto</h3><button onclick="closeProductModal()" class="text-slate-400"><i class="fa-solid fa-xmark"></i></button></div>
             <input type="hidden" id="editProductId">
             <div class="space-y-3">
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1">Código de Barras:</label>
-                    <div class="flex space-x-2">
-                        <input type="text" id="prodBarcode" placeholder="Ej. 759100123456" class="w-full p-2.5 rounded-xl app-input border text-sm">
-                        <button onclick="startScannerForInput('prodBarcode')" class="bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 px-3 rounded-xl hover:bg-emerald-600/20 transition text-xs font-bold border border-emerald-500/30"><i class="fa-solid fa-barcode text-base"></i></button>
-                    </div>
-                </div>
-                <div><label class="block text-xs font-bold text-slate-400 mb-1">Nombre:</label><input type="text" id="prodName" placeholder="Ej. Queso Paisa 500g" class="w-full p-2.5 rounded-xl app-input border text-sm"></div>
+                <div class="flex space-x-2"><input type="text" id="prodBarcode" placeholder="Código de barras" class="w-full p-2.5 rounded-xl app-input border text-sm"><button onclick="startScannerForInput('prodBarcode')" class="bg-emerald-600/10 text-emerald-400 px-3 rounded-xl border border-emerald-500/30"><i class="fa-solid fa-barcode"></i></button></div>
+                <input type="text" id="prodName" placeholder="Nombre del producto" class="w-full p-2.5 rounded-xl app-input border text-sm">
                 <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-bold text-slate-400 mb-1">Costo ($):</label><input type="number" step="0.01" id="prodCostUsd" oninput="calculateSellingPrice()" placeholder="0.00" class="w-full p-2.5 rounded-xl app-input border text-sm"></div>
-                    <div><label class="block text-xs font-bold text-slate-400 mb-1">Ganancia (%):</label><input type="number" step="0.1" id="prodMargin" oninput="calculateSellingPrice()" value="30" class="w-full p-2.5 rounded-xl app-input border text-sm"></div>
+                    <input type="number" step="0.01" id="prodCostUsd" oninput="calculateSellingPrice()" placeholder="Costo ($)" class="w-full p-2.5 rounded-xl app-input border text-sm">
+                    <input type="number" step="0.1" id="prodMargin" oninput="calculateSellingPrice()" value="30" placeholder="Margen (%)" class="w-full p-2.5 rounded-xl app-input border text-sm">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-1">Venta final ($):</label><input type="number" step="0.01" id="prodPriceUsd" oninput="calculateMargin()" placeholder="0.00" class="w-full p-2.5 rounded-xl app-input border text-sm font-bold"></div>
-                    <div><label class="block text-xs font-bold text-slate-400 mb-1">Stock:</label><input type="number" step="0.01" id="prodStock" placeholder="0" class="w-full p-2.5 rounded-xl app-input border text-sm"></div>
+                    <input type="number" step="0.01" id="prodPriceUsd" oninput="calculateMargin()" placeholder="Venta ($)" class="w-full p-2.5 rounded-xl app-input border text-sm font-bold text-emerald-400">
+                    <input type="number" step="0.01" id="prodStock" placeholder="Stock" class="w-full p-2.5 rounded-xl app-input border text-sm">
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 mb-1">Tipo de Venta:</label>
-                    <select id="prodType" class="w-full p-2.5 rounded-xl app-input border text-sm">
-                        <option value="unit">Por Unidad / Pieza</option>
-                        <option value="weight">Por Peso (Kilos / Gramos)</option>
-                    </select>
-                </div>
+                <select id="prodType" class="w-full p-2.5 rounded-xl app-input border text-sm"><option value="unit">Unidad / Pieza</option><option value="weight">Por Peso (Kg)</option></select>
             </div>
             <div class="flex space-x-3 pt-2">
-                <button onclick="closeProductModal()" class="w-1/2 app-btn-secondary font-semibold py-3 rounded-xl text-sm border">Cancelar</button>
-                <button onclick="saveProduct()" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm">Guardar</button>
+                <button onclick="closeProductModal()" class="w-1/2 app-btn-secondary py-3 rounded-xl text-sm">Cancelar</button>
+                <button onclick="saveProduct()" class="w-1/2 bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm">Guardar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Cliente (Gestión) -->
+    <!-- Modal Cliente -->
     <div id="clientModal" class="fixed inset-0 z-[50] flex items-center justify-center bg-black/70 backdrop-blur-sm hidden p-4">
         <div class="app-modal border rounded-2xl p-6 max-w-md w-full mx-auto shadow-2xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
-                <h3 class="text-lg font-bold">Registrar Cliente</h3>
-                <button onclick="closeClientModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3"><h3 class="text-lg font-bold">Registrar Cliente</h3><button onclick="closeClientModal()" class="text-slate-400"><i class="fa-solid fa-xmark"></i></button></div>
             <input type="hidden" id="editClientId">
             <div class="space-y-3">
-                <div><label class="block text-xs font-bold text-slate-400 mb-1">Cédula / RIF:</label><input type="text" id="clientDoc" placeholder="V-12345678" class="w-full p-2.5 rounded-xl app-input border text-sm"></div>
-                <div><label class="block text-xs font-bold text-slate-400 mb-1">Nombre:</label><input type="text" id="clientName" placeholder="Comercial C.A." class="w-full p-2.5 rounded-xl app-input border text-sm"></div>
-                <div><label class="block text-xs font-bold text-slate-400 mb-1">Teléfono:</label><input type="text" id="clientPhone" placeholder="0414-0000000" class="w-full p-2.5 rounded-xl app-input border text-sm"></div>
-                <div><label class="block text-xs font-bold text-slate-400 mb-1">Dirección:</label><input type="text" id="clientAddress" placeholder="Caracas" class="w-full p-2.5 rounded-xl app-input border text-sm"></div>
+                <input type="text" id="clientDoc" placeholder="Cédula / RIF" class="w-full p-2.5 rounded-xl app-input border text-sm">
+                <input type="text" id="clientName" placeholder="Nombre completo" class="w-full p-2.5 rounded-xl app-input border text-sm">
+                <input type="text" id="clientPhone" placeholder="Teléfono" class="w-full p-2.5 rounded-xl app-input border text-sm">
+                <input type="text" id="clientAddress" placeholder="Dirección" class="w-full p-2.5 rounded-xl app-input border text-sm">
             </div>
             <div class="flex space-x-3 pt-2">
-                <button onclick="closeClientModal()" class="w-1/2 app-btn-secondary font-semibold py-3 rounded-xl text-sm border">Cancelar</button>
-                <button onclick="saveClient()" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm">Guardar</button>
+                <button onclick="closeClientModal()" class="w-1/2 app-btn-secondary py-3 rounded-xl text-sm">Cancelar</button>
+                <button onclick="saveClient()" class="w-1/2 bg-emerald-600 text-white font-bold py-3 rounded-xl text-sm">Guardar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Checkout -->
+    <!-- Modal Checkout POS -->
     <div id="checkoutModal" class="fixed inset-0 z-[50] flex items-center justify-center bg-black/70 backdrop-blur-sm hidden p-4">
         <div class="app-modal border rounded-2xl p-6 max-w-lg w-full mx-auto shadow-2xl space-y-5">
-            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
-                <h3 class="text-lg font-bold"><i class="fa-solid fa-file-invoice-dollar mr-2 text-emerald-500"></i>Procesar Pago</h3>
-                <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3"><h3 class="text-lg font-bold">Procesar Venta</h3><button onclick="closeCheckoutModal()" class="text-slate-400"><i class="fa-solid fa-xmark"></i></button></div>
             <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-400">Cliente Facturado:</label>
-                    <select id="checkoutClientSelect" class="w-full mt-1 p-2.5 rounded-xl app-input border text-sm font-bold focus:outline-none pointer-events-none" disabled></select>
-                </div>
+                <select id="checkoutClientSelect" class="w-full p-2.5 rounded-xl app-input border text-sm font-bold pointer-events-none" disabled></select>
                 <div class="app-input border p-4 rounded-xl space-y-1">
-                    <div class="flex justify-between text-sm"><span class="text-slate-400">Monto USD:</span> <span id="modalCheckoutUsd" class="font-bold">$0.00</span></div>
-                    <div class="flex justify-between text-base font-extrabold text-emerald-600 dark:text-emerald-400"><span>Monto VES (<span id="checkoutActiveRateName" class="text-xs uppercase">BCV</span>):</span><span id="modalCheckoutBs">Bs. 0.00</span></div>
+                    <div class="flex justify-between text-sm"><span class="text-slate-400">Total USD:</span> <span id="modalCheckoutUsd" class="font-bold">$0.00</span></div>
+                    <div class="flex justify-between text-base font-extrabold text-emerald-400"><span>Total VES:</span><span id="modalCheckoutBs">Bs. 0.00</span></div>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Método de Pago:</label>
+                    <label class="block text-xs font-bold text-slate-400 mb-2">Método de Pago:</label>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        <button onclick="setPaymentMethod('Divisas ($)')" id="pay-divisas" class="pay-method-btn p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-bold flex flex-col items-center space-y-1"><i class="fa-solid fa-money-bill-wave text-lg"></i><span>Divisas ($)</span></button>
-                        <button onclick="setPaymentMethod('Pago Móvil')" id="pay-pagomovil" class="pay-method-btn p-3 rounded-xl border-2 border-slate-300 dark:border-slate-700 app-input text-xs font-bold flex flex-col items-center space-y-1"><i class="fa-solid fa-mobile-screen-button text-lg"></i><span>Pago Móvil</span></button>
-                        <button onclick="setPaymentMethod('Punto de Venta')" id="pay-punto" class="pay-method-btn p-3 rounded-xl border-2 border-slate-300 dark:border-slate-700 app-input text-xs font-bold flex flex-col items-center space-y-1"><i class="fa-solid fa-credit-card text-lg"></i><span>Punto Tarjeta</span></button>
-                        <button onclick="setPaymentMethod('Zelle / Otros')" id="pay-zelle" class="pay-method-btn p-3 rounded-xl border-2 border-slate-300 dark:border-slate-700 app-input text-xs font-bold flex flex-col items-center space-y-1"><i class="fa-solid fa-building-columns text-lg"></i><span>Zelle / Bs Efe</span></button>
+                        <button onclick="setPaymentMethod('Divisas ($)')" id="pay-divisas" class="pay-method-btn p-3 rounded-xl border-2 border-emerald-500 bg-emerald-950/40 text-emerald-300 text-xs font-bold flex flex-col items-center"><i class="fa-solid fa-money-bill-wave text-lg"></i><span>Divisas ($)</span></button>
+                        <button onclick="setPaymentMethod('Pago Móvil')" id="pay-pagomovil" class="pay-method-btn p-3 rounded-xl border-2 border-slate-700 app-input text-xs font-bold flex flex-col items-center"><i class="fa-solid fa-mobile-screen-button text-lg"></i><span>Pago Móvil</span></button>
+                        <button onclick="setPaymentMethod('Punto de Venta')" id="pay-punto" class="pay-method-btn p-3 rounded-xl border-2 border-slate-700 app-input text-xs font-bold flex flex-col items-center"><i class="fa-solid fa-credit-card text-lg"></i><span>Punto Tarjeta</span></button>
+                        <button onclick="setPaymentMethod('Zelle / Otros')" id="pay-zelle" class="pay-method-btn p-3 rounded-xl border-2 border-slate-700 app-input text-xs font-bold flex flex-col items-center"><i class="fa-solid fa-building-columns text-lg"></i><span>Zelle / Bs Efe</span></button>
                     </div>
                 </div>
-                <div class="space-y-3 pt-2">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div><label class="block text-xs font-bold text-slate-400 mb-1">Recibido ($):</label><input type="number" id="receivedUsd" oninput="calculateChange()" placeholder="0.00" class="w-full p-2.5 rounded-xl app-input border text-sm"></div>
-                        <div><label class="block text-xs font-bold text-slate-400 mb-1">Recibido (Bs):</label><input type="number" id="receivedBs" oninput="calculateChangeBs()" placeholder="0.00" class="w-full p-2.5 rounded-xl app-input border text-sm"></div>
-                    </div>
-                    <div class="app-input border p-3 rounded-xl flex justify-between items-center text-sm font-bold">
-                        <span>Vuelto:</span>
-                        <div class="text-right"><div id="changeUsd" class="text-emerald-600 dark:text-emerald-400">$0.00</div><div id="changeBs" class="text-xs text-slate-400">Bs. 0.00</div></div>
-                    </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="number" id="receivedUsd" oninput="calculateChange()" placeholder="Recibido ($)" class="w-full p-2.5 rounded-xl app-input border text-sm">
+                    <input type="number" id="receivedBs" oninput="calculateChangeBs()" placeholder="Recibido (Bs)" class="w-full p-2.5 rounded-xl app-input border text-sm">
+                </div>
+                <div class="app-input border p-3 rounded-xl flex justify-between items-center text-sm font-bold">
+                    <span>Vuelto:</span><div class="text-right"><div id="changeUsd" class="text-emerald-400">$0.00</div><div id="changeBs" class="text-xs text-slate-400">Bs. 0.00</div></div>
                 </div>
             </div>
-            <div class="flex space-x-3 pt-2">
-                <button onclick="closeCheckoutModal()" class="w-1/2 app-btn-secondary font-semibold py-3 rounded-xl text-sm border">Cancelar</button>
-                <button onclick="completeSale()" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm flex items-center justify-center space-x-2"><i class="fa-solid fa-check"></i><span>Completar Venta</span></button>
+            <div class="flex flex-col sm:flex-row gap-2 pt-2">
+                <button onclick="completeSale()" class="w-full sm:w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm flex items-center justify-center space-x-2"><i class="fa-solid fa-check"></i><span>Completar Venta</span></button>
+                <button onclick="completeSaleAsCredit()" class="w-full sm:w-1/2 bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm flex items-center justify-center space-x-2"><i class="fa-solid fa-hand-holding-dollar"></i><span>Fiar / Crédito</span></button>
             </div>
         </div>
     </div>
@@ -405,27 +319,27 @@
             <div class="flex items-center space-x-3">
                 <button onclick="toggleSidebar()" class="p-2 rounded-xl app-btn-secondary border-none transition focus:outline-none"><i class="fa-solid fa-bars text-xl"></i></button>
                 <div class="flex items-center space-x-2">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-emerald-600/30"><i class="fa-solid fa-store"></i></div>
+                    <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold text-lg shadow-md"><i class="fa-solid fa-store"></i></div>
                     <div>
                         <h1 id="headerStoreName" class="font-bold text-sm leading-tight">BodegaExpress VE</h1>
-                        <div id="liveClock" class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold whitespace-nowrap">12/08/2026 12:00:00 AM</div>
+                        <div id="liveClock" class="text-[11px] text-emerald-400 font-semibold whitespace-nowrap">12/08/2026 12:00:00 AM</div>
                     </div>
                 </div>
             </div>
 
             <div class="flex items-center space-x-2 relative">
                 <button id="rateDropdownBtn" onclick="toggleRateDropdown(event)" class="app-input border rounded-xl px-3 py-1.5 flex items-center space-x-2 cursor-pointer transition shadow-sm">
-                    <div id="headerRateLabel" class="text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider">BCV:</div>
+                    <div id="headerRateLabel" class="text-emerald-400 text-xs font-bold uppercase tracking-wider">BCV:</div>
                     <div id="headerActiveRateVal" class="font-extrabold text-sm">37.20</div>
                     <span class="text-xs text-slate-400">Bs</span>
                     <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
                 </button>
                 
                 <div id="rateDropdown" class="absolute top-full right-0 mt-2 w-52 app-modal border rounded-xl shadow-2xl hidden z-[100] p-1.5 space-y-1">
-                    <button onclick="setActiveRateType('bcv')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold app-hover-item flex justify-between items-center transition cursor-pointer"><span>BCV Oficial</span> <span id="dropdownValBcv" class="font-bold text-emerald-600 dark:text-emerald-400">37.20</span></button>
-                    <button onclick="setActiveRateType('eur')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold app-hover-item flex justify-between items-center transition cursor-pointer"><span>Euro (€)</span> <span id="dropdownValEur" class="font-bold text-emerald-600 dark:text-emerald-400">882.30</span></button>
-                    <button onclick="setActiveRateType('usdt')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold app-hover-item flex justify-between items-center transition cursor-pointer"><span>Binance USDT</span> <span id="dropdownValUsdt" class="font-bold text-emerald-600 dark:text-emerald-400">38.10</span></button>
-                    <button onclick="setActiveRateType('promedio')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold app-hover-item flex justify-between items-center transition cursor-pointer"><span>Promedio Web</span> <span id="dropdownValProm" class="font-bold text-emerald-600 dark:text-emerald-400">37.65</span></button>
+                    <button onclick="setActiveRateType('bcv')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold app-hover-item flex justify-between items-center transition cursor-pointer"><span>BCV Oficial</span> <span id="dropdownValBcv" class="font-bold text-emerald-400">37.20</span></button>
+                    <button onclick="setActiveRateType('eur')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold app-hover-item flex justify-between items-center transition cursor-pointer"><span>Euro (€)</span> <span id="dropdownValEur" class="font-bold text-emerald-400">882.30</span></button>
+                    <button onclick="setActiveRateType('usdt')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold app-hover-item flex justify-between items-center transition cursor-pointer"><span>Binance USDT</span> <span id="dropdownValUsdt" class="font-bold text-emerald-400">38.10</span></button>
+                    <button onclick="setActiveRateType('promedio')" class="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold app-hover-item flex justify-between items-center transition cursor-pointer"><span>Promedio Web</span> <span id="dropdownValProm" class="font-bold text-emerald-400">37.65</span></button>
                 </div>
             </div>
         </div>
@@ -434,25 +348,23 @@
     <div class="flex flex-1 relative w-full overflow-hidden hidden" id="mainContentArea">
         <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
         <aside id="sidebar" class="fixed inset-y-0 left-0 w-72 app-card border-r z-50 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col shadow-2xl">
-            <div class="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold"><i class="fa-solid fa-compass"></i></div>
-                    <span class="font-bold text-lg">Menú Principal</span>
-                </div>
+            <div class="p-6 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center space-x-3"><div class="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold"><i class="fa-solid fa-compass"></i></div><span class="font-bold text-lg">Menú Principal</span></div>
                 <button onclick="toggleSidebar()" class="text-slate-400 hover:text-slate-200 p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <nav class="flex-1 p-4 space-y-1.5 overflow-y-auto">
-                <button onclick="switchTab('pos'); toggleSidebar();" id="nav-pos" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"><i class="fa-solid fa-cash-register w-5 text-center text-lg"></i><span>Punto de Venta (POS)</span></button>
+                <button onclick="switchTab('pos'); toggleSidebar();" id="nav-pos" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition bg-emerald-600/10 text-emerald-400 border border-emerald-500/20"><i class="fa-solid fa-cash-register w-5 text-center text-lg"></i><span>Punto de Venta (POS)</span></button>
                 <button onclick="switchTab('inventory'); toggleSidebar();" id="nav-inventory" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition app-hover-item"><i class="fa-solid fa-boxes-stacked w-5 text-center text-lg"></i><span>Inventario y Stock</span></button>
                 <button onclick="switchTab('clients'); toggleSidebar();" id="nav-clients" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition app-hover-item"><i class="fa-solid fa-users w-5 text-center text-lg"></i><span>Clientes</span></button>
+                <button onclick="switchTab('credits'); toggleSidebar();" id="nav-credits" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition app-hover-item"><i class="fa-solid fa-hand-holding-dollar w-5 text-center text-lg"></i><span>Fiados y Créditos</span></button>
                 <button onclick="switchTab('history'); toggleSidebar();" id="nav-history" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition app-hover-item"><i class="fa-solid fa-clock-rotate-left w-5 text-center text-lg"></i><span>Historial de Ventas</span></button>
                 <button onclick="switchTab('stats'); toggleSidebar();" id="nav-stats" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition app-hover-item"><i class="fa-solid fa-chart-pie w-5 text-center text-lg"></i><span>Corte de Caja / Reportes</span></button>
                 <button onclick="switchTab('calculator'); toggleSidebar();" id="nav-calculator" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition app-hover-item"><i class="fa-solid fa-calculator w-5 text-center text-lg"></i><span>Calculadora y Divisas</span></button>
                 <button onclick="switchTab('settings'); toggleSidebar();" id="nav-settings" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition app-hover-item"><i class="fa-solid fa-gear w-5 text-center text-lg"></i><span>Configuración General</span></button>
             </nav>
-            <div class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 flex flex-col items-center">
+            <div class="p-4 border-t border-slate-800 bg-slate-950 flex flex-col items-center">
                 <div class="text-xs text-slate-400 font-medium text-center">Licencia Activa • v5.6 Pro</div>
-                <div id="sidebarLicenseOwner" class="text-[10px] text-emerald-500 font-bold mt-1"></div>
+                <div id="sidebarLicenseOwner" class="text-[10px] text-emerald-400 font-bold mt-1"></div>
             </div>
         </aside>
 
@@ -464,10 +376,10 @@
                     <div class="flex-1 flex items-center space-x-2 app-card border p-2 rounded-2xl shadow-sm">
                         <div class="pl-3 text-slate-400"><i class="fa-solid fa-magnifying-glass"></i></div>
                         <input type="text" id="posSearch" oninput="filterPosProducts()" placeholder="Buscar producto..." class="w-full py-2 px-2 text-sm focus:outline-none bg-transparent">
-                        <button onclick="startBarcodeScanner()" class="bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600/20 p-2.5 rounded-xl transition flex items-center space-x-1 px-3 text-xs font-bold border border-emerald-500/30 whitespace-nowrap"><i class="fa-solid fa-barcode text-base"></i><span class="hidden sm:inline">Escanear</span></button>
+                        <button onclick="startBarcodeScanner()" class="bg-emerald-600/10 text-emerald-400 hover:bg-emerald-600/20 p-2.5 rounded-xl transition flex items-center space-x-1 px-3 text-xs font-bold border border-emerald-500/35 whitespace-nowrap"><i class="fa-solid fa-barcode text-base"></i><span class="hidden sm:inline">Escanear</span></button>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <button onclick="togglePosViewMode()" class="app-card border px-4 py-2.5 rounded-xl text-slate-500 hover:text-emerald-500 transition shadow-sm flex items-center justify-center h-full" title="Alternar Vista"><i id="posViewIcon" class="fa-solid fa-list text-lg"></i></button>
+                        <button onclick="togglePosViewMode()" class="app-card border px-4 py-2.5 rounded-xl text-slate-400 hover:text-emerald-400 transition shadow-sm flex items-center justify-center h-full" title="Alternar Vista"><i id="posViewIcon" class="fa-solid fa-list text-lg"></i></button>
                         <button onclick="openAddQuickProductModal()" class="flex-1 sm:w-auto app-card border px-4 py-2.5 rounded-xl text-sm font-semibold shadow-md transition flex items-center justify-center space-x-2 hover:opacity-80 h-full whitespace-nowrap"><i class="fa-solid fa-plus-circle text-emerald-500"></i><span>Nuevo Prod.</span></button>
                     </div>
                 </div>
@@ -480,12 +392,12 @@
 
                     <div class="lg:col-span-5 app-card border rounded-2xl p-5 shadow-sm flex flex-col justify-between">
                         <div>
-                            <div class="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
-                                <h3 class="font-bold text-base flex items-center space-x-2"><i class="fa-solid fa-cart-shopping text-emerald-600 dark:text-emerald-400"></i><span>Venta Actual</span></h3>
+                            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                                <h3 class="font-bold text-base flex items-center space-x-2"><i class="fa-solid fa-cart-shopping text-emerald-400"></i><span>Venta Actual</span></h3>
                                 <button onclick="clearCart()" class="text-xs text-rose-500 font-semibold transition hover:underline">Vaciar Carrito</button>
                             </div>
-                            <div class="py-3 border-b border-slate-200 dark:border-slate-800/80 space-y-2 relative">
-                                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400">Cliente Asignado:</label>
+                            <div class="py-3 border-b border-slate-800/80 space-y-2 relative">
+                                <label class="block text-xs font-bold text-slate-400">Cliente Asignado:</label>
                                 <div class="flex items-center space-x-2">
                                     <div class="relative flex-1">
                                         <div class="flex items-center space-x-2 w-full app-input border px-3 py-2 rounded-xl">
@@ -494,19 +406,19 @@
                                         </div>
                                         <div id="posClientDropdown" class="absolute w-full mt-1 app-modal border rounded-xl shadow-2xl hidden z-[60] max-h-48 overflow-y-auto"></div>
                                     </div>
-                                    <button onclick="openQuickClientModal()" class="app-input border text-emerald-600 dark:text-emerald-400 px-3 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap hover:opacity-80"><i class="fa-solid fa-user-plus"></i> Nuevo</button>
+                                    <button onclick="openQuickClientModal()" class="app-input border text-emerald-400 px-3 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap hover:opacity-80"><i class="fa-solid fa-user-plus"></i> Nuevo</button>
                                 </div>
                             </div>
-                            <div id="cartItemsList" class="divide-y divide-slate-200 dark:divide-slate-800/60 max-h-[28vh] overflow-y-auto my-3 pr-1">
-                                <div class="text-center py-10 text-slate-400 text-sm"><i class="fa-solid fa-basket-shopping text-3xl mb-2 text-slate-300 dark:text-slate-700"></i><p>El carrito está vacío</p></div>
+                            <div id="cartItemsList" class="divide-y divide-slate-800/60 max-h-[28vh] overflow-y-auto my-3 pr-1">
+                                <div class="text-center py-10 text-slate-400 text-sm"><i class="fa-solid fa-basket-shopping text-3xl mb-2 text-slate-700"></i><p>El carrito está vacío</p></div>
                             </div>
                         </div>
-                        <div class="border-t border-slate-200 dark:border-slate-800 pt-4 space-y-3">
+                        <div class="border-t border-slate-800 pt-4 space-y-3">
                             <div class="space-y-1.5 text-sm">
-                                <div class="flex justify-between font-bold text-base pt-1"><span>Total USD:</span> <span id="cartTotalUsd" class="text-emerald-600 dark:text-emerald-400">$0.00</span></div>
-                                <div class="flex justify-between font-extrabold text-lg bg-emerald-50 dark:bg-emerald-950/40 p-2 rounded-xl border border-emerald-200 dark:border-emerald-800/40"><span class="text-emerald-700 dark:text-emerald-300">Total VES:</span><span id="cartTotalBs" class="text-emerald-600 dark:text-emerald-400">Bs. 0.00</span></div>
+                                <div class="flex justify-between font-bold text-base pt-1"><span>Total USD:</span> <span id="cartTotalUsd" class="text-emerald-400">$0.00</span></div>
+                                <div class="flex justify-between font-extrabold text-lg bg-emerald-950/40 p-2 rounded-xl border border-emerald-800/40"><span class="text-emerald-300">Total VES:</span><span id="cartTotalBs" class="text-emerald-400">Bs. 0.00</span></div>
                             </div>
-                            <button onclick="openCheckoutModal()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-600/25 transition flex items-center justify-center space-x-2 text-base"><i class="fa-solid fa-cash-register"></i><span>Procesar Pago</span></button>
+                            <button onclick="openCheckoutModal()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition flex items-center justify-center space-x-2 text-base"><i class="fa-solid fa-cash-register"></i><span>Procesar Pago / Fiar</span></button>
                         </div>
                     </div>
                 </div>
@@ -519,18 +431,18 @@
                     <button onclick="openAddQuickProductModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-md transition flex items-center space-x-2"><i class="fa-solid fa-plus"></i><span>Agregar Producto</span></button>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="app-card border p-5 rounded-2xl shadow-sm flex items-center space-x-4"><div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xl"><i class="fa-solid fa-boxes-packing"></i></div><div><span class="text-[11px] font-bold text-slate-400 uppercase">Costo Total</span><div id="invTotalCostUsd" class="text-xl font-extrabold text-amber-600 dark:text-amber-400">$0.00</div><div id="invTotalCostBs" class="text-xs font-bold text-slate-500">Bs. 0.00</div></div></div>
-                    <div class="app-card border p-5 rounded-2xl shadow-sm flex items-center space-x-4"><div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xl"><i class="fa-solid fa-sack-dollar"></i></div><div><span class="text-[11px] font-bold text-slate-400 uppercase">Venta Proyectada</span><div id="invTotalSaleUsd" class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">$0.00</div><div id="invTotalSaleBs" class="text-xs font-bold text-slate-500">Bs. 0.00</div></div></div>
-                    <div class="app-card border p-5 rounded-2xl shadow-sm flex items-center space-x-4"><div class="w-12 h-12 rounded-xl bg-sky-500/10 text-sky-500 flex items-center justify-center text-xl"><i class="fa-solid fa-cubes"></i></div><div><span class="text-[11px] font-bold text-slate-400 uppercase">Total en Stock</span><div id="invTotalStock" class="text-xl font-extrabold text-sky-600 dark:text-sky-400">0</div><div class="text-xs font-bold text-slate-500">Unidades / Kg</div></div></div>
+                    <div class="app-card border p-5 rounded-2xl shadow-sm flex items-center space-x-4"><div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xl"><i class="fa-solid fa-boxes-packing"></i></div><div><span class="text-[11px] font-bold text-slate-400 uppercase">Costo Total</span><div id="invTotalCostUsd" class="text-xl font-extrabold text-amber-400">$0.00</div><div id="invTotalCostBs" class="text-xs font-bold text-slate-500">Bs. 0.00</div></div></div>
+                    <div class="app-card border p-5 rounded-2xl shadow-sm flex items-center space-x-4"><div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xl"><i class="fa-solid fa-sack-dollar"></i></div><div><span class="text-[11px] font-bold text-slate-400 uppercase">Venta Proyectada</span><div id="invTotalSaleUsd" class="text-xl font-extrabold text-emerald-400">$0.00</div><div id="invTotalSaleBs" class="text-xs font-bold text-slate-500">Bs. 0.00</div></div></div>
+                    <div class="app-card border p-5 rounded-2xl shadow-sm flex items-center space-x-4"><div class="w-12 h-12 rounded-xl bg-sky-500/10 text-sky-500 flex items-center justify-center text-xl"><i class="fa-solid fa-cubes"></i></div><div><span class="text-[11px] font-bold text-slate-400 uppercase">Total en Stock</span><div id="invTotalStock" class="text-xl font-extrabold text-sky-400">0</div><div class="text-xs font-bold text-slate-500">Unidades / Kg</div></div></div>
                 </div>
                 <div class="app-card border rounded-2xl shadow-sm overflow-hidden">
-                    <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                    <div class="p-4 border-b border-slate-800 flex items-center justify-between">
                         <div class="flex items-center space-x-2 app-input border px-3 py-1.5 rounded-xl w-full sm:w-72"><i class="fa-solid fa-magnifying-glass text-slate-400 text-sm"></i><input type="text" id="inventorySearch" oninput="renderInventoryTable()" placeholder="Buscar en inventario..." class="w-full text-sm focus:outline-none bg-transparent"></div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-sm">
                             <thead><tr class="app-table-header font-bold border-b"><th class="p-4">Código / Barras</th><th class="p-4">Producto</th><th class="p-4">Costo ($)</th><th class="p-4">Ganancia (%)</th><th class="p-4">Venta ($)</th><th class="p-4">Precio (Bs)</th><th class="p-4">Stock</th><th class="p-4 text-right">Acciones</th></tr></thead>
-                            <tbody id="inventoryTableBody" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody>
+                            <tbody id="inventoryTableBody" class="divide-y divide-slate-800"></tbody>
                         </table>
                     </div>
                 </div>
@@ -546,7 +458,29 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-sm">
                             <thead><tr class="app-table-header font-bold border-b"><th class="p-4">Cédula / RIF</th><th class="p-4">Nombre</th><th class="p-4">Teléfono</th><th class="p-4">Dirección</th><th class="p-4 text-right">Acciones</th></tr></thead>
-                            <tbody id="clientsTableBody" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody>
+                            <tbody id="clientsTableBody" class="divide-y divide-slate-800"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISTA FIADOS Y CRÉDITOS (NUEVO MÓDULO) -->
+            <div id="tab-credits" class="space-y-6 hidden w-full">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div><h2 class="font-bold text-xl">Control de Fiados y Créditos</h2><p class="text-sm text-slate-400">Administra cuentas por cobrar de tus clientes.</p></div>
+                    <button onclick="openNewCreditModal()" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-md transition flex items-center space-x-2"><i class="fa-solid fa-plus"></i><span>Nuevo Fiado Manual</span></button>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="app-card border p-5 rounded-2xl shadow-sm flex items-center space-x-4"><div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xl"><i class="fa-solid fa-wallet"></i></div><div><span class="text-[11px] font-bold text-slate-400 uppercase">Total por Cobrar (USD)</span><div id="totalCreditsUsd" class="text-2xl font-extrabold text-amber-400">$0.00</div></div></div>
+                    <div class="app-card border p-5 rounded-2xl shadow-sm flex items-center space-x-4"><div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xl"><i class="fa-solid fa-money-bill-transfer"></i></div><div><span class="text-[11px] font-bold text-slate-400 uppercase">Total por Cobrar (VES)</span><div id="totalCreditsBs" class="text-2xl font-extrabold text-emerald-400">Bs. 0.00</div></div></div>
+                </div>
+
+                <div class="app-card border rounded-2xl shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead><tr class="app-table-header font-bold border-b"><th class="p-4">Fecha</th><th class="p-4">Cliente</th><th class="p-4">Detalle / Pedido</th><th class="p-4">Total ($)</th><th class="p-4">Total (Bs)</th><th class="p-4 text-right">Acción (Cobrar)</th></tr></thead>
+                            <tbody id="creditsTableBody" class="divide-y divide-slate-800"></tbody>
                         </table>
                     </div>
                 </div>
@@ -559,7 +493,7 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-sm">
                             <thead><tr class="app-table-header font-bold border-b"><th class="p-4">Venta</th><th class="p-4">Fecha</th><th class="p-4">Método</th><th class="p-4">Total ($)</th><th class="p-4">Total (Bs)</th><th class="p-4 text-right">Factura</th></tr></thead>
-                            <tbody id="historyTableBody" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody>
+                            <tbody id="historyTableBody" class="divide-y divide-slate-800"></tbody>
                         </table>
                     </div>
                 </div>
@@ -572,14 +506,14 @@
                     <button onclick="performCashClosing()" class="bg-rose-600 hover:bg-rose-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-lg transition flex items-center space-x-2"><i class="fa-solid fa-lock"></i><span>Cierre de Caja (Z)</span></button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="app-card border p-6 rounded-2xl shadow-sm space-y-2"><span class="text-xs font-bold text-slate-400 uppercase">Ventas Totales</span><div id="statsTotalUsd" class="text-2xl font-extrabold">$0.00</div><div id="statsTotalBs" class="text-sm font-bold text-emerald-600 dark:text-emerald-400">Bs. 0.00</div></div>
+                    <div class="app-card border p-6 rounded-2xl shadow-sm space-y-2"><span class="text-xs font-bold text-slate-400 uppercase">Ventas Totales</span><div id="statsTotalUsd" class="text-2xl font-extrabold">$0.00</div><div id="statsTotalBs" class="text-sm font-bold text-emerald-400">Bs. 0.00</div></div>
                     <div class="app-card border p-6 rounded-2xl shadow-sm space-y-2"><span class="text-xs font-bold text-slate-400 uppercase">Transacciones</span><div id="statsCount" class="text-2xl font-extrabold">0</div><div class="text-sm text-slate-400">Ventas</div></div>
-                    <div class="app-card border p-6 rounded-2xl shadow-sm space-y-2"><span class="text-xs font-bold text-slate-400 uppercase">Tasa Activa</span><div id="statsBcv" class="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">0.00</div><div class="text-sm text-slate-400">Bolívares</div></div>
+                    <div class="app-card border p-6 rounded-2xl shadow-sm space-y-2"><span class="text-xs font-bold text-slate-400 uppercase">Tasa Activa</span><div id="statsBcv" class="text-2xl font-extrabold text-emerald-400">0.00</div><div class="text-sm text-slate-400">Bolívares</div></div>
                 </div>
                 <div class="app-card border p-6 rounded-2xl shadow-sm space-y-4"><h3 class="font-bold text-base">Desglose</h3><div id="statsByMethod" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div></div>
             </div>
 
-            <!-- VISTA CALCULADORA (Con Copia Universal) -->
+            <!-- VISTA CALCULADORA -->
             <div id="tab-calculator" class="space-y-6 hidden w-full">
                 <div><h2 class="font-bold text-xl">Calculadora y Convertidor</h2></div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -606,11 +540,11 @@
                     <div class="app-card border rounded-2xl p-6 space-y-4">
                         <h3 class="font-bold text-base"><i class="fa-solid fa-calculator text-emerald-500"></i> Calculadora Comercial (%)</h3>
                         <div class="space-y-3">
-                            <input type="text" id="calcScreen" readonly class="w-full p-3 rounded-xl app-input border text-right text-xl font-mono text-emerald-600 dark:text-emerald-400 font-bold" value="0">
+                            <input type="text" id="calcScreen" readonly class="w-full p-3 rounded-xl app-input border text-right text-xl font-mono text-emerald-400 font-bold" value="0">
                             <div class="grid grid-cols-4 gap-2">
                                 <button onclick="calcClear()" class="p-3 bg-rose-600/20 text-rose-500 font-bold rounded-xl">C</button>
                                 <button onclick="calcBackspace()" class="p-3 app-input border font-bold rounded-xl"><i class="fa-solid fa-delete-left"></i></button>
-                                <button onclick="calcAppend('%')" class="p-3 app-input border text-emerald-500 font-bold rounded-xl">%</button>
+                                <button onclick="calcAppend('%')" class="p-3 app-input border text-emerald-400 font-bold rounded-xl">%</button>
                                 <button onclick="calcAppend('/')" class="p-3 app-input border font-bold rounded-xl">÷</button>
                                 <button onclick="calcAppend('7')" class="p-3 app-input border font-bold rounded-xl">7</button><button onclick="calcAppend('8')" class="p-3 app-input border font-bold rounded-xl">8</button><button onclick="calcAppend('9')" class="p-3 app-input border font-bold rounded-xl">9</button><button onclick="calcAppend('*')" class="p-3 app-input border font-bold rounded-xl">×</button>
                                 <button onclick="calcAppend('4')" class="p-3 app-input border font-bold rounded-xl">4</button><button onclick="calcAppend('5')" class="p-3 app-input border font-bold rounded-xl">5</button><button onclick="calcAppend('6')" class="p-3 app-input border font-bold rounded-xl">6</button><button onclick="calcAppend('-')" class="p-3 app-input border font-bold rounded-xl">-</button>
@@ -622,7 +556,7 @@
                 </div>
             </div>
 
-            <!-- VISTA CONFIGURACIÓN (CON PANEL ADMIN Y CONFIG) -->
+            <!-- VISTA CONFIGURACIÓN -->
             <div id="tab-settings" class="space-y-6 hidden w-full">
                 <div><h2 class="font-bold text-xl">Configuración General</h2></div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -635,10 +569,7 @@
                             <div><label class="block text-xs font-bold text-slate-400 mb-1">Teléfono:</label><input type="text" id="setStorePhone" class="w-full p-2.5 rounded-xl app-input border text-sm"></div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-400 mb-1">Modo Pantalla:</label>
-                                <select id="themeModeSelect" onchange="changeThemeMode(this.value)" class="w-full p-2.5 rounded-xl app-input border text-sm">
-                                    <option value="dark">Modo Oscuro</option>
-                                    <option value="light">Modo Claro</option>
-                                </select>
+                                <select id="themeModeSelect" onchange="changeThemeMode(this.value)" class="w-full p-2.5 rounded-xl app-input border text-sm"><option value="dark">Modo Oscuro</option><option value="light">Modo Claro</option></select>
                             </div>
                             <button onclick="saveStoreSettings()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl transition text-sm">Guardar Datos</button>
                         </div>
@@ -646,12 +577,12 @@
 
                     <div class="space-y-6">
                         <div class="app-card border rounded-2xl p-6 space-y-4">
-                            <div class="flex justify-between items-center"><h3 class="font-bold text-base"><i class="fa-solid fa-coins mr-2 text-emerald-500"></i>Tasas BCV & Euro</h3><button onclick="fetchOnlineRates()" class="bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-emerald-600/20 transition">Sincronizar</button></div>
+                            <div class="flex justify-between items-center"><h3 class="font-bold text-base"><i class="fa-solid fa-coins mr-2 text-emerald-500"></i>Tasas BCV & Euro</h3><button onclick="fetchOnlineRates()" class="bg-emerald-600/10 text-emerald-400 text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-emerald-600/20 transition">Sincronizar</button></div>
                             <div class="grid grid-cols-2 gap-3">
-                                <div class="app-input border p-3 rounded-xl"><span class="text-xs text-slate-400">BCV Oficial:</span><input type="number" step="0.01" id="setBcvRate" class="w-full app-card border p-1.5 mt-1 rounded-lg text-sm font-bold text-emerald-600 dark:text-emerald-400"></div>
-                                <div class="app-input border p-3 rounded-xl"><span class="text-xs text-slate-400">Euro (€):</span><input type="number" step="0.01" id="setEurRate" class="w-full app-card border p-1.5 mt-1 rounded-lg text-sm font-bold text-emerald-600 dark:text-emerald-400"></div>
-                                <div class="app-input border p-3 rounded-xl"><span class="text-xs text-slate-400">USDT:</span><input type="number" step="0.01" id="setUsdtRate" class="w-full app-card border p-1.5 mt-1 rounded-lg text-sm font-bold text-emerald-600 dark:text-emerald-400"></div>
-                                <div class="app-input border p-3 rounded-xl"><span class="text-xs text-slate-400">Promedio:</span><input type="number" step="0.01" id="setPromRate" class="w-full app-card border p-1.5 mt-1 rounded-lg text-sm font-bold text-emerald-600 dark:text-emerald-400"></div>
+                                <div class="app-input border p-3 rounded-xl"><span class="text-xs text-slate-400">BCV Oficial:</span><input type="number" step="0.01" id="setBcvRate" class="w-full app-card border p-1.5 mt-1 rounded-lg text-sm font-bold text-emerald-400"></div>
+                                <div class="app-input border p-3 rounded-xl"><span class="text-xs text-slate-400">Euro (€):</span><input type="number" step="0.01" id="setEurRate" class="w-full app-card border p-1.5 mt-1 rounded-lg text-sm font-bold text-emerald-400"></div>
+                                <div class="app-input border p-3 rounded-xl"><span class="text-xs text-slate-400">USDT:</span><input type="number" step="0.01" id="setUsdtRate" class="w-full app-card border p-1.5 mt-1 rounded-lg text-sm font-bold text-emerald-400"></div>
+                                <div class="app-input border p-3 rounded-xl"><span class="text-xs text-slate-400">Promedio:</span><input type="number" step="0.01" id="setPromRate" class="w-full app-card border p-1.5 mt-1 rounded-lg text-sm font-bold text-emerald-400"></div>
                             </div>
                             <button onclick="saveRatesManual()" class="w-full app-btn-secondary font-bold py-2.5 rounded-xl transition text-sm border">Guardar Tasas Manuales</button>
                         </div>
@@ -685,7 +616,23 @@
         </main>
     </div>
 
-    <!-- SCRIPT PRINCIPAL -->
+    <!-- Modal para nuevo fiado manual -->
+    <div id="newCreditModal" class="fixed inset-0 z-[95] flex items-center justify-center bg-black/85 backdrop-blur-sm hidden p-4">
+        <div class="app-modal border rounded-2xl p-6 max-w-sm w-full mx-auto shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3"><h3 class="text-base font-bold">Registrar Fiado Manual</h3><button onclick="closeNewCreditModal()" class="text-slate-400"><i class="fa-solid fa-xmark"></i></button></div>
+            <div class="space-y-3">
+                <div><label class="block text-xs font-bold text-slate-400 mb-1">Cliente:</label><select id="manualCreditClient" class="w-full p-2.5 rounded-xl app-input border text-sm"></select></div>
+                <div><label class="block text-xs font-bold text-slate-400 mb-1">Concepto / Detalle:</label><input type="text" id="manualCreditConcept" placeholder="Ej. 2 Kilos de Queso" class="w-full p-2.5 rounded-xl app-input border text-sm"></div>
+                <div><label class="block text-xs font-bold text-slate-400 mb-1">Monto en USD ($):</label><input type="number" step="0.01" id="manualCreditUsd" placeholder="0.00" class="w-full p-2.5 rounded-xl app-input border text-sm font-bold text-amber-400"></div>
+            </div>
+            <div class="flex space-x-3 pt-2">
+                <button onclick="closeNewCreditModal()" class="w-1/2 app-btn-secondary py-3 rounded-xl text-sm">Cancelar</button>
+                <button onclick="saveManualCredit()" class="w-1/2 bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-xl text-sm">Guardar Fiado</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT PRINCIPAL INTEGRADO -->
     <script>
         // ==========================================
         // SISTEMA DE LICENCIAS Y SUSCRIPCIÓN MENSUAL
@@ -693,7 +640,7 @@
         const MASTER_KEY = "MASTER-BODEGA-2026";
         const SUBSCRIPTION_PRICE_USD = 2.99;
         const SUBSCRIPTION_DAYS = 30;
-        const GRACE_PERIOD_DAYS = 5; // Días de gracia antes del bloqueo total
+        const GRACE_PERIOD_DAYS = 5;
 
         let licenseSystem = {
             isActivated: false,
@@ -704,19 +651,14 @@
             history: []
         };
 
-        // Copia universal compatible con navegadores e iframes
-        function copyTextUniversal(textToCopy, successMsg = "¡Copiado al portapapeles!") {
+        function copyTextUniversal(textToCopy, successMsg = "¡Copiado con éxito!") {
             const hiddenInput = document.getElementById('hiddenCopyInput');
             hiddenInput.value = textToCopy;
             hiddenInput.select();
             hiddenInput.setSelectionRange(0, 99999);
-            
             let success = false;
             try { success = document.execCommand('copy'); } catch (err) {}
-
-            if (!success && navigator.clipboard) {
-                navigator.clipboard.writeText(textToCopy);
-            }
+            if (!success && navigator.clipboard) navigator.clipboard.writeText(textToCopy);
             showToast(successMsg);
         }
 
@@ -749,7 +691,6 @@
         function processActivation() {
             const name = document.getElementById('actClientName').value.trim();
             const code = document.getElementById('actCode').value.trim().toUpperCase();
-            
             if (!name || !code) { showAlert("Atención", "Ingrese el Nombre y Código.", "warning"); return; }
             if (code === MASTER_KEY) { activateApp(name, "LLAVE_MAESTRA"); return; }
 
@@ -759,23 +700,19 @@
                 activateApp(name, code);
                 return;
             }
-
             if (code.startsWith("VE-PRO-") && code.length >= 10) {
                  activateApp(name, code);
                  return;
             }
-
             showAlert("Error", "Código de activación inválido.", "error");
         }
 
         function activateApp(registeredName, usedCode) {
             licenseSystem.isActivated = true;
             licenseSystem.registeredName = registeredName;
-            
             const now = Date.now();
             licenseSystem.activationDate = now;
             licenseSystem.nextBillingDate = now + (SUBSCRIPTION_DAYS * 24 * 60 * 60 * 1000);
-            
             licenseSystem.history.unshift({ clientName: registeredName, code: usedCode, date: new Date().toLocaleString() });
             saveLicenseSystem();
             
@@ -783,35 +720,24 @@
             document.getElementById('mainHeader').classList.remove('hidden');
             document.getElementById('mainContentArea').classList.remove('hidden');
             document.getElementById('sidebarLicenseOwner').innerText = `Licencia: ${registeredName}`;
-            
             startApp();
             checkBillingStatus();
         }
 
-        // --- SISTEMA DE COBRO CON DÍAS DE GRACIA ---
         function checkBillingStatus() {
             if (!licenseSystem.nextBillingDate) {
                 licenseSystem.nextBillingDate = Date.now() + (SUBSCRIPTION_DAYS * 24 * 60 * 60 * 1000);
                 saveLicenseSystem();
             }
-
             const now = Date.now();
             const expirationDate = licenseSystem.nextBillingDate;
             const graceDate = expirationDate + (GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000);
 
             if (now > graceDate) {
-                // Bloqueo total, el periodo de gracia expiró
                 showBillingScreen();
             } else if (now > expirationDate) {
-                // Periodo de gracia activo (Advertencia)
                 const daysLeft = Math.ceil((graceDate - now) / (1000 * 60 * 60 * 24));
-                showAlert(
-                    'Suscripción Vencida', 
-                    `Tu mes culminó. Tienes ${daysLeft} días de gracia para reportar el pago antes de que se bloquee el sistema. Puedes pagar y enviar el comprobante en cualquier momento.`, 
-                    'warning'
-                );
-                // NOTA: Para no ser agresivos, no bloqueamos la pantalla, solo mostramos el aviso de arriba.
-                // En el futuro puedes agregar un botón permanente rojo que diga "PAGAR MES" si están en gracia.
+                showAlert('Suscripción Vencida', `Tu mes culminó. Tienes ${daysLeft} días de gracia para pagar sin interrupciones.`, 'warning');
             }
         }
 
@@ -823,35 +749,33 @@
         function updateBillingAmount() {
             const currentRate = rates.bcv || 36.50;
             const bsAmount = (SUBSCRIPTION_PRICE_USD * currentRate).toFixed(2);
-            const billingAmountEl = document.getElementById('billingAmountBs');
-            if(billingAmountEl) billingAmountEl.innerText = bsAmount;
+            const el = document.getElementById('billingAmountBs');
+            if(el) el.innerText = bsAmount;
         }
 
-        function copyBillingAmount(btnElement) {
+        function copyBillingAmount(btn) {
             const amount = document.getElementById('billingAmountBs').innerText;
             copyTextUniversal(amount, `Monto copiado: Bs. ${amount}`);
-            const icon = btnElement.querySelector('i');
+            const icon = btn.querySelector('i');
             icon.className = 'fa-solid fa-check text-xl';
-            setTimeout(() => { icon.className = 'fa-regular fa-copy text-xl'; }, 1500);
+            setTimeout(() => { icon.className = 'fa-regular fa-copy text-xl pointer-events-none'; }, 1500);
         }
 
-        function copyPagoMovilData(btnElement) {
+        function copyPagoMovilData(btn) {
             const pmData = "Banco Nacional de Crédito (BNC)\nCI: V-21271099\nTeléfono: 04169485195";
             copyTextUniversal(pmData, "Datos de Pago Móvil copiados");
-            const originalText = btnElement.innerHTML;
-            btnElement.innerHTML = `<i class="fa-solid fa-check pointer-events-none"></i> <span class="pointer-events-none">¡Copiado!</span>`;
-            setTimeout(() => { btnElement.innerHTML = originalText; }, 2000);
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-check pointer-events-none"></i> <span class="pointer-events-none">¡Copiado!</span>`;
+            setTimeout(() => { btn.innerHTML = originalText; }, 2000);
         }
 
         function confirmPaymentAndUnlock() {
-            // Se renueva por 30 días DESDE EL MOMENTO DEL PAGO (No acumula deuda atrasada)
             licenseSystem.nextBillingDate = Date.now() + (SUBSCRIPTION_DAYS * 24 * 60 * 60 * 1000);
             saveLicenseSystem();
             document.getElementById('monthlyBillingScreen').classList.add('hidden');
             window.open("https://wa.me/message/44PCLSJ7IE5OF1", "_blank");
         }
 
-        // --- PANEL ADMINISTRATIVO SECRETO ---
         function promptAdminAccess() {
             document.getElementById('adminMasterKeyInput').value = '';
             document.getElementById('adminAuthModal').classList.remove('hidden');
@@ -891,7 +815,7 @@
                 tbodyCodes.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-slate-500">Sin códigos</td></tr>';
                 return;
             }
-            licenseSystem.generatedCodes.forEach((item, index) => {
+            licenseSystem.generatedCodes.forEach((item) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `<td class="p-2 font-bold">${item.clientName}</td><td class="p-2 font-mono">${item.code}</td><td class="p-2 text-right"><button onclick="copyTextUniversal('${item.code}', 'Código copiado')" class="text-sky-400 mr-2"><i class="fa-regular fa-copy"></i></button></td>`;
                 tbodyCodes.appendChild(tr);
@@ -900,7 +824,7 @@
 
 
         // ==========================================
-        // NÚCLEO DE LA APLICACIÓN POS
+        // NÚCLEO POS Y MÓDULO DE FIADOS / CRÉDITOS
         // ==========================================
         let rates = { bcv: 36.50, eur: 39.50, usdt: 37.20, promedio: 36.85 };
         let activeRateKey = 'bcv';
@@ -908,11 +832,11 @@
         let clients = [{ id: 1, doc: "V-00000000", name: "Cliente General", phone: "0000", address: "VE" }];
         let products = [
             { id: 1, barcode: "7591001000101", name: "Harina P.A.N. 1kg", costUsd: 1.00, margin: 25, priceUsd: 1.25, stock: 45, type: 'unit' },
-            { id: 2, barcode: "7591002000202", name: "Queso Llanero (Kg)", costUsd: 5.00, margin: 30, priceUsd: 6.50, stock: 25.0, type: 'weight' },
-            { id: 3, barcode: "7591003000303", name: "Café Moka 200g", costUsd: 2.80, margin: 25, priceUsd: 3.50, stock: 20, type: 'unit' }
+            { id: 2, barcode: "7591002000202", name: "Queso Llanero (Kg)", costUsd: 5.00, margin: 30, priceUsd: 6.50, stock: 25.0, type: 'weight' }
         ];
         let cart = [];
         let salesHistory = [];
+        let creditsList = []; // Array para los fiados y créditos
         let selectedPaymentMethod = "Divisas ($)";
         let calcDisplay = "0";
         let lastCompletedSale = null;
@@ -950,6 +874,7 @@
             renderCart();
             renderInventoryTable();
             renderClientsTable();
+            renderCreditsTable();
             renderHistoryTable();
             renderStats();
             populateClientSelect();
@@ -958,26 +883,35 @@
             updateClock();
             
             const defClient = clients.find(c => c.id === currentSelectedClientId);
-            if(defClient) {
-                document.getElementById('posClientSearchInput').value = defClient.name;
-            }
+            if(defClient) document.getElementById('posClientSearchInput').value = defClient.name;
         }
 
         function updateClock() {
             document.getElementById('liveClock').innerText = new Date().toLocaleString('es-VE');
         }
 
+        // Sintetizador de audio "Ching" con volumen restaurado y vibrante
         function playChingSound() {
             try {
                 if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 if (audioCtx.state === 'suspended') audioCtx.resume();
                 const now = audioCtx.currentTime;
+                
                 const osc1 = audioCtx.createOscillator();
                 const gain1 = audioCtx.createGain();
                 osc1.type = 'sine'; osc1.frequency.setValueAtTime(1318.51, now);
-                gain1.gain.setValueAtTime(0.15, now); gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                gain1.gain.setValueAtTime(0.35, now); // Volumen alto y nítido
+                gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
                 osc1.connect(gain1); gain1.connect(audioCtx.destination);
-                osc1.start(now); osc1.stop(now + 0.3);
+                osc1.start(now); osc1.stop(now + 0.4);
+
+                const osc2 = audioCtx.createOscillator();
+                const gain2 = audioCtx.createGain();
+                osc2.type = 'triangle'; osc2.frequency.setValueAtTime(2637.02, now + 0.05);
+                gain2.gain.setValueAtTime(0.3, now + 0.05);
+                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+                osc2.connect(gain2); gain2.connect(audioCtx.destination);
+                osc2.start(now + 0.05); osc2.stop(now + 0.7);
             } catch (e) {}
         }
 
@@ -988,6 +922,7 @@
             localStorage.setItem('ve_clients', JSON.stringify(clients));
             localStorage.setItem('ve_products', JSON.stringify(products));
             localStorage.setItem('ve_salesHistory', JSON.stringify(salesHistory));
+            localStorage.setItem('ve_creditsList', JSON.stringify(creditsList));
         }
 
         function loadFromLocalStorage() {
@@ -997,6 +932,7 @@
             const c = localStorage.getItem('ve_clients'); if (c) clients = JSON.parse(c);
             const p = localStorage.getItem('ve_products'); if (p) products = JSON.parse(p);
             const sh = localStorage.getItem('ve_salesHistory'); if (sh) salesHistory = JSON.parse(sh);
+            const cl = localStorage.getItem('ve_creditsList'); if (cl) creditsList = JSON.parse(cl);
 
             document.getElementById('setStoreName').value = storeInfo.name;
             document.getElementById('setStoreRif').value = storeInfo.rif;
@@ -1026,14 +962,15 @@
         }
 
         function switchTab(id) {
-            ['pos', 'inventory', 'clients', 'history', 'stats', 'calculator', 'settings'].forEach(t => {
+            ['pos', 'inventory', 'clients', 'credits', 'history', 'stats', 'calculator', 'settings'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
-                document.getElementById(`nav-${t}`).classList.remove('bg-emerald-600/10', 'text-emerald-600', 'dark:text-emerald-400', 'border', 'border-emerald-500/20');
+                document.getElementById(`nav-${t}`).classList.remove('bg-emerald-600/10', 'text-emerald-400', 'border', 'border-emerald-500/20');
             });
             document.getElementById(`tab-${id}`).classList.remove('hidden');
-            document.getElementById(`nav-${id}`).classList.add('bg-emerald-600/10', 'text-emerald-600', 'dark:text-emerald-400', 'border', 'border-emerald-500/20');
+            document.getElementById(`nav-${id}`).classList.add('bg-emerald-600/10', 'text-emerald-400', 'border', 'border-emerald-500/20');
             
             if(id === 'inventory') renderInventoryTable();
+            if(id === 'credits') renderCreditsTable();
             if(id === 'history') renderHistoryTable();
             if(id === 'stats') renderStats();
             if(id === 'clients') renderClientsTable();
@@ -1043,12 +980,9 @@
         window.addEventListener('click', () => { document.getElementById('rateDropdown')?.classList.add('hidden'); });
 
         function setActiveRateType(key) {
-            activeRateKey = key; 
-            saveToLocalStorage(); 
-            updateRateDisplay(); 
+            activeRateKey = key; saveToLocalStorage(); updateRateDisplay(); 
             document.getElementById('rateDropdown').classList.add('hidden');
-            renderPosProducts(); renderCart(); renderInventoryTable(); convertCurrency('usd');
-            showAlert('Tasa Actualizada', `Toda la plataforma se actualizó a la tasa: ${key.toUpperCase()}.`, 'success');
+            renderPosProducts(); renderCart(); renderInventoryTable(); renderCreditsTable(); convertCurrency('usd');
         }
 
         function updateRateDisplay() {
@@ -1065,35 +999,19 @@
 
         async function fetchOnlineRates() {
             try {
-                const [resDol, resEur] = await Promise.all([ fetch('https://ve.dolarapi.com/v1/dolares'), fetch('https://ve.dolarapi.com/v1/euros') ]);
+                const [resDol] = await Promise.all([ fetch('https://ve.dolarapi.com/v1/dolares') ]);
                 const dataDol = await resDol.json();
-                const dataEur = await resEur.json();
-
                 if (dataDol && Array.isArray(dataDol)) {
                     const bcv = dataDol.find(d => d.fuente === 'oficial' || d.fuente === 'bcv');
-                    const paralelo = dataDol.find(d => d.fuente === 'paralelo' || d.fuente === 'promedio' || d.fuente === 'enparalelovzla');
                     if (bcv && bcv.promedio) rates.bcv = parseFloat(bcv.promedio);
-                    if (paralelo && paralelo.promedio) { rates.usdt = parseFloat(paralelo.promedio); rates.promedio = parseFloat(paralelo.promedio); }
                 }
-
-                if (dataEur) {
-                    if (dataEur.promedio && dataEur.promedio > 10) { rates.eur = parseFloat(dataEur.promedio); } 
-                    else if (Array.isArray(dataEur)) {
-                        const eurBcv = dataEur.find(e => e.fuente === 'oficial' || e.fuente === 'bcv');
-                        if (eurBcv && eurBcv.promedio) rates.eur = parseFloat(eurBcv.promedio);
-                    }
-                }
-
-                saveToLocalStorage(); updateRateDisplay(); renderPosProducts(); renderCart(); renderInventoryTable(); updateBillingAmount();
-            } catch (e) { console.error("No se pudieron conectar las tasas online."); }
+                saveToLocalStorage(); updateRateDisplay(); renderPosProducts(); renderCart(); renderInventoryTable(); renderCreditsTable(); updateBillingAmount();
+            } catch (e) {}
         }
 
         function saveRatesManual() {
             rates.bcv = parseFloat(document.getElementById('setBcvRate').value) || rates.bcv;
-            rates.eur = parseFloat(document.getElementById('setEurRate').value) || rates.eur;
-            rates.usdt = parseFloat(document.getElementById('setUsdtRate').value) || rates.usdt;
-            rates.promedio = parseFloat(document.getElementById('setPromRate').value) || rates.promedio;
-            saveToLocalStorage(); updateRateDisplay(); renderPosProducts(); renderInventoryTable(); updateBillingAmount();
+            saveToLocalStorage(); updateRateDisplay(); renderPosProducts(); renderInventoryTable(); renderCreditsTable(); updateBillingAmount();
             showAlert('Éxito', 'Tasas guardadas manualmente.', 'success');
         }
 
@@ -1133,29 +1051,17 @@
                 const priceBs = (p.priceUsd * currentRate).toFixed(2);
                 const isOutOfStock = p.stock <= 0;
                 const weightLabel = p.type === 'weight' ? 'kg' : '';
-                const weightLabel2 = p.type === 'weight' ? '/kg' : '';
-                const stockBadgeClass = p.stock > 5 ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400';
+                const stockBadgeClass = p.stock > 5 ? 'bg-emerald-950 text-emerald-400' : 'bg-rose-950 text-rose-400';
 
                 const card = document.createElement('div');
-                if (posViewMode === 'grid') {
-                    card.className = `app-card border rounded-2xl p-3.5 flex flex-col justify-between shadow-sm hover:border-emerald-500/50 transition cursor-pointer ${isOutOfStock ? 'opacity-50' : ''}`;
-                    card.onclick = () => handleProductClick(p.id);
-                    card.innerHTML = `
-                        <div>
-                            <div class="flex justify-between items-start mb-2"><span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${stockBadgeClass}">Stock: ${p.stock} ${weightLabel}</span><span class="text-[10px] text-slate-400 font-mono">${p.barcode}</span></div>
-                            <h4 class="font-bold text-sm line-clamp-2 mb-1">${p.name}</h4>
-                        </div>
-                        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-baseline justify-between mt-2"><span class="font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">$${p.priceUsd.toFixed(2)} ${weightLabel2}</span><span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Bs. ${priceBs}</span></div>`;
-                } else {
-                    card.className = `app-card border rounded-xl p-3 flex items-center justify-between shadow-sm hover:border-emerald-500/50 transition cursor-pointer ${isOutOfStock ? 'opacity-50' : ''}`;
-                    card.onclick = () => handleProductClick(p.id);
-                    card.innerHTML = `
-                        <div class="flex items-center space-x-3">
-                            <div class="flex-shrink-0 w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-400"><i class="fa-solid fa-box"></i></div>
-                            <div><h4 class="font-bold text-sm leading-tight">${p.name}</h4><div class="text-[10px] text-slate-500 font-mono flex items-center space-x-2 mt-0.5"><span>${p.barcode}</span><span class="px-1.5 py-0.5 rounded ${stockBadgeClass} bg-opacity-20 text-[9px] font-bold">Stock: ${p.stock} ${weightLabel}</span></div></div>
-                        </div>
-                        <div class="text-right"><div class="font-extrabold text-emerald-600 dark:text-emerald-400 text-sm">$${p.priceUsd.toFixed(2)}</div><div class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Bs. ${priceBs}</div></div>`;
-                }
+                card.className = `app-card border rounded-2xl p-3.5 flex flex-col justify-between shadow-sm hover:border-emerald-500/50 transition cursor-pointer ${isOutOfStock ? 'opacity-50' : ''}`;
+                card.onclick = () => handleProductClick(p.id);
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2"><span class="text-[10px] font-bold px-2 py-0.5 rounded-md ${stockBadgeClass}">Stock: ${p.stock} ${weightLabel}</span><span class="text-[10px] text-slate-400 font-mono">${p.barcode}</span></div>
+                        <h4 class="font-bold text-sm line-clamp-2 mb-1">${p.name}</h4>
+                    </div>
+                    <div class="pt-2 border-t border-slate-800 flex items-baseline justify-between mt-2"><span class="font-extrabold text-emerald-400 text-sm">$${p.priceUsd.toFixed(2)}</span><span class="text-xs font-semibold text-slate-400">Bs. ${priceBs}</span></div>`;
                 grid.appendChild(card);
             });
         }
@@ -1179,7 +1085,7 @@
             
             filtered.forEach(c => {
                 const btn = document.createElement('button');
-                btn.className = "w-full text-left px-3 py-2 text-xs app-hover-item transition border-b border-slate-100 dark:border-slate-800 last:border-0";
+                btn.className = "w-full text-left px-3 py-2 text-xs app-hover-item transition border-b border-slate-800 last:border-0";
                 btn.innerHTML = `<span class="font-bold">${c.name}</span> <span class="text-slate-400">(${c.doc})</span>`;
                 btn.onmousedown = () => selectPosClient(c.id, c.name);
                 drop.appendChild(btn);
@@ -1201,7 +1107,6 @@
                 document.getElementById('weightModalTitle').innerText = `Pesable: ${p.name}`;
                 document.getElementById('weightInputValue').value = "1.000";
                 document.getElementById('weightInputType').value = "kg";
-                toggleWeightInputFields();
                 document.getElementById('weightModal').classList.remove('hidden');
             } else {
                 addToCart(p.id, 1);
@@ -1211,9 +1116,9 @@
         function toggleWeightInputFields() {
             const type = document.getElementById('weightInputType').value;
             const lbl = document.getElementById('weightValueLabel');
-            if (type === 'kg') lbl.innerText = "Ingrese Cantidad (Kilos):";
-            else if (type === 'usd') lbl.innerText = "Ingrese Monto en Dólares ($):";
-            else lbl.innerText = "Ingrese Monto en Bolívares (Bs):";
+            if (type === 'kg') lbl.innerText = "Ingrese Kilos:";
+            else if (type === 'usd') lbl.innerText = "Dólares ($):";
+            else lbl.innerText = "Bolívares (Bs):";
         }
 
         function closeWeightModal() { document.getElementById('weightModal').classList.add('hidden'); currentWeightProduct = null; }
@@ -1230,7 +1135,7 @@
             else if (type === 'usd') finalKg = val / currentWeightProduct.priceUsd;
             else if (type === 'bs') finalKg = (val / currentRate) / currentWeightProduct.priceUsd;
 
-            addToCart(currentWeightProduct.id, finalKg);
+            addToCart(currentWeightProduct.id, parseFloat(finalKg.toFixed(3)));
             closeWeightModal();
         }
 
@@ -1263,7 +1168,7 @@
             const container = document.getElementById('cartItemsList'); container.innerHTML = '';
             const currentRate = rates[activeRateKey];
             if (cart.length === 0) {
-                container.innerHTML = `<div class="text-center py-10 text-slate-400 text-sm"><i class="fa-solid fa-basket-shopping text-3xl mb-2 text-slate-300 dark:text-slate-700"></i><p>Carrito vacío</p></div>`;
+                container.innerHTML = `<div class="text-center py-10 text-slate-400 text-sm"><i class="fa-solid fa-basket-shopping text-3xl mb-2 text-slate-700"></i><p>Carrito vacío</p></div>`;
                 document.getElementById('cartTotalUsd').innerText = '$0.00';
                 document.getElementById('cartTotalBs').innerText = 'Bs. 0.00';
                 return;
@@ -1272,14 +1177,14 @@
             cart.forEach(item => {
                 let t = item.priceUsd * item.quantity; totalUsd += t;
                 const div = document.createElement('div');
-                div.className = 'py-3 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 last:border-0';
+                div.className = 'py-3 flex items-center justify-between border-b border-slate-800 last:border-0';
                 div.innerHTML = `
                     <div class="flex-1 pr-2"><h5 class="font-bold text-xs line-clamp-1">${item.name}</h5><div class="text-xs text-slate-400">$${item.priceUsd.toFixed(2)}</div></div>
                     <div class="flex items-center space-x-2">
-                        <button onclick="updateCartQty(${item.id}, -1)" class="w-6 h-6 rounded-lg app-input font-bold text-xs hover:opacity-80">-</button>
+                        <button onclick="updateCartQty(${item.id}, -1)" class="w-6 h-6 rounded-lg app-input font-bold text-xs">-</button>
                         <span class="font-bold text-xs w-12 text-center">${item.type === 'weight' ? item.quantity.toFixed(3) + 'kg' : item.quantity}</span>
-                        <button onclick="updateCartQty(${item.id}, 1)" class="w-6 h-6 rounded-lg app-input font-bold text-xs hover:opacity-80">+</button>
-                        <button onclick="removeFromCart(${item.id})" class="text-rose-500 ml-1 p-1 hover:opacity-80"><i class="fa-solid fa-trash text-xs"></i></button>
+                        <button onclick="updateCartQty(${item.id}, 1)" class="w-6 h-6 rounded-lg app-input font-bold text-xs">+</button>
+                        <button onclick="removeFromCart(${item.id})" class="text-rose-500 ml-1 p-1"><i class="fa-solid fa-trash text-xs"></i></button>
                     </div>`;
                 container.appendChild(div);
             });
@@ -1309,11 +1214,11 @@
         function setPaymentMethod(m) {
             selectedPaymentMethod = m;
             document.querySelectorAll('.pay-method-btn').forEach(btn => {
-                btn.classList.remove('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-950/40', 'text-emerald-700', 'dark:text-emerald-300');
-                btn.classList.add('border-slate-300', 'dark:border-slate-700', 'app-input');
+                btn.classList.remove('border-emerald-500', 'bg-emerald-950/40', 'text-emerald-300');
+                btn.classList.add('border-slate-700', 'app-input');
             });
             const sel = document.getElementById(`pay-${m.toLowerCase().includes('divisas') ? 'divisas' : m.toLowerCase().includes('móvil') ? 'pagomovil' : m.toLowerCase().includes('punto') ? 'punto' : 'zelle'}`);
-            if (sel) { sel.classList.remove('app-input'); sel.classList.add('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-950/40', 'text-emerald-700', 'dark:text-emerald-300'); }
+            if (sel) { sel.classList.remove('app-input'); sel.classList.add('border-emerald-500', 'bg-emerald-950/40', 'text-emerald-300'); }
         }
 
         function calculateChange() {
@@ -1338,9 +1243,7 @@
             const currentRate = rates[activeRateKey];
             let totalUsd = cart.reduce((acc, i) => acc + (i.priceUsd * i.quantity), 0);
             let totalBs = totalUsd * currentRate;
-            
-            const finalClientSelectId = document.getElementById('checkoutClientSelect').value || currentSelectedClientId;
-            const clientObj = clients.find(c => c.id == finalClientSelectId) || clients[0];
+            const clientObj = clients.find(c => c.id == currentSelectedClientId) || clients[0];
 
             cart.forEach(item => { const p = products.find(prod => prod.id === item.id); if (p) p.stock -= item.quantity; });
 
@@ -1360,10 +1263,116 @@
             closeCheckoutModal(); showInvoiceModal(newSale);
         }
 
+        // FUNCIÓN FIAR / CRÉDITO DESDE EL POS
+        function completeSaleAsCredit() {
+            if (cart.length === 0) return;
+            const currentRate = rates[activeRateKey];
+            let totalUsd = cart.reduce((acc, i) => acc + (i.priceUsd * i.quantity), 0);
+            let totalBs = totalUsd * currentRate;
+            const clientObj = clients.find(c => c.id == currentSelectedClientId) || clients[0];
+
+            cart.forEach(item => { const p = products.find(prod => prod.id === item.id); if (p) p.stock -= item.quantity; });
+
+            const creditItem = {
+                id: Date.now(),
+                date: new Date().toLocaleDateString(),
+                clientName: clientObj.name,
+                clientDoc: clientObj.doc,
+                detail: cart.map(i => `${i.quantity}x ${i.name}`).join(', '),
+                totalUsd: totalUsd,
+                totalBs: totalBs
+            };
+
+            creditsList.unshift(creditItem);
+            saveToLocalStorage();
+            renderCreditsTable();
+            cart = []; renderCart(); renderPosProducts(); renderInventoryTable();
+            closeCheckoutModal();
+            showAlert("Fiado Registrado", `Se ha guardado el crédito para el cliente ${clientObj.name}.`, "success");
+        }
+
+        // MÓDULO MANUAL DE FIADOS
+        function openNewCreditModal() {
+            const select = document.getElementById('manualCreditClient');
+            select.innerHTML = clients.map(c => `<option value="${c.name}">${c.name} (${c.doc})</option>`).join('');
+            document.getElementById('manualCreditConcept').value = '';
+            document.getElementById('manualCreditUsd').value = '';
+            document.getElementById('newCreditModal').classList.remove('hidden');
+        }
+        function closeNewCreditModal() { document.getElementById('newCreditModal').classList.add('hidden'); }
+
+        function saveManualCredit() {
+            const clientName = document.getElementById('manualCreditClient').value;
+            const detail = document.getElementById('manualCreditConcept').value.trim();
+            const totalUsd = parseFloat(document.getElementById('manualCreditUsd').value) || 0;
+            if (!detail || totalUsd <= 0) { showAlert("Error", "Complete los datos del fiado.", "error"); return; }
+            const currentRate = rates[activeRateKey];
+
+            creditsList.unshift({
+                id: Date.now(),
+                date: new Date().toLocaleDateString(),
+                clientName: clientName,
+                clientDoc: "Directo",
+                detail: detail,
+                totalUsd: totalUsd,
+                totalBs: totalUsd * currentRate
+            });
+
+            saveToLocalStorage();
+            renderCreditsTable();
+            closeNewCreditModal();
+            showAlert("Éxito", "Fiado guardado correctamente.", "success");
+        }
+
+        function renderCreditsTable() {
+            const tbody = document.getElementById('creditsTableBody');
+            tbody.innerHTML = '';
+            let totalUsd = 0; let totalBs = 0;
+            const currentRate = rates[activeRateKey];
+
+            if (creditsList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500">No hay cuentas fiadas pendientes</td></tr>`;
+                document.getElementById('totalCreditsUsd').innerText = `$0.00`;
+                document.getElementById('totalCreditsBs').innerText = `Bs. 0.00`;
+                return;
+            }
+
+            creditsList.forEach((cred, index) => {
+                totalUsd += cred.totalUsd;
+                totalBs += (cred.totalUsd * currentRate);
+                const tr = document.createElement('tr');
+                tr.className = 'app-table-row border-b transition';
+                tr.innerHTML = `
+                    <td class="p-4 text-xs text-slate-400">${cred.date}</td>
+                    <td class="p-4 font-bold text-sm">${cred.clientName}</td>
+                    <td class="p-4 text-xs text-slate-300">${cred.detail}</td>
+                    <td class="p-4 font-bold text-amber-400">$${cred.totalUsd.toFixed(2)}</td>
+                    <td class="p-4 text-xs">Bs. ${(cred.totalUsd * currentRate).toFixed(2)}</td>
+                    <td class="p-4 text-right">
+                        <button onclick="payCredit(${index})" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-md">Cobrar / Pagado</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('totalCreditsUsd').innerText = `$${totalUsd.toFixed(2)}`;
+            document.getElementById('totalCreditsBs').innerText = `Bs. ${totalBs.toFixed(2)}`;
+        }
+
+        function payCredit(index) {
+            showConfirmModal("Cobrar Fiado", "¿El cliente ya pagó esta cuenta? Se eliminará de los pendientes.", (confirmed) => {
+                if (confirmed) {
+                    creditsList.splice(index, 1);
+                    saveToLocalStorage();
+                    renderCreditsTable();
+                    showAlert("Pagado", "La cuenta ha sido saldada.", "success");
+                }
+            });
+        }
+
         function showInvoiceModal(sale) {
             document.getElementById('invStoreName').innerText = storeInfo.name;
             document.getElementById('invStoreRif').innerText = `RIF: ${storeInfo.rif}`;
-            document.getElementById('invStoreAddress').innerText = storeInfo.address;
             document.getElementById('invNumber').innerText = `Factura: ${sale.id}`;
             document.getElementById('invDate').innerText = sale.date;
             document.getElementById('invClient').innerText = `Cliente: ${sale.client}`;
@@ -1373,7 +1382,7 @@
             sale.items.forEach(i => {
                 let t = i.priceUsd * i.quantity;
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td class="py-1">${i.type === 'weight' ? i.quantity.toFixed(3) + 'kg' : i.quantity}</td><td class="py-1">${i.name}</td><td class="py-1 text-right">$${t.toFixed(2)}</td>`;
+                tr.innerHTML = `<td class="py-1">${i.quantity}</td><td class="py-1">${i.name}</td><td class="py-1 text-right">$${t.toFixed(2)}</td>`;
                 tbody.appendChild(tr);
             });
             document.getElementById('invTotalUsd').innerText = `$${sale.totalUsd.toFixed(2)}`;
@@ -1382,12 +1391,7 @@
         }
 
         function closeInvoiceModal() { document.getElementById('invoiceModal').classList.add('hidden'); }
-        function shareInvoice() {
-            if (!lastCompletedSale) return;
-            const text = `Factura ${lastCompletedSale.id} - ${storeInfo.name}\nCliente: ${lastCompletedSale.client}\nTotal: $${lastCompletedSale.totalUsd.toFixed(2)} (Bs. ${lastCompletedSale.totalBs.toFixed(2)})`;
-            if (navigator.share) navigator.share({ title: 'Factura', text: text }).catch(() => {});
-            else { copyTextUniversal(text, "Factura copiada"); }
-        }
+        function shareInvoice() { window.print(); }
 
         function performCashClosing() {
             if (salesHistory.length === 0) { showAlert("Caja", "Sin ventas.", "error"); return; }
@@ -1397,10 +1401,7 @@
             });
         }
 
-        function openQuickClientModal() {
-            document.getElementById('qcDoc').value = ''; document.getElementById('qcName').value = ''; document.getElementById('qcPhone').value = '';
-            document.getElementById('quickClientModal').classList.remove('hidden');
-        }
+        function openQuickClientModal() { document.getElementById('quickClientModal').classList.remove('hidden'); }
         function closeQuickClientModal() { document.getElementById('quickClientModal').classList.add('hidden'); }
         
         function saveQuickClient() {
@@ -1413,8 +1414,6 @@
             
             currentSelectedClientId = newC.id;
             document.getElementById('posClientSearchInput').value = newC.name;
-            document.getElementById('checkoutClientSelect').value = newC.id;
-
             document.getElementById('qcDoc').value = ''; document.getElementById('qcName').value = ''; document.getElementById('qcPhone').value = '';
             closeQuickClientModal(); showAlert("Éxito", "Cliente registrado.", "success");
         }
@@ -1435,41 +1434,52 @@
                         select.innerHTML = '';
                         devices.forEach((device, i) => { select.appendChild(new Option(device.label || `Cámara ${i+1}`, device.id)); });
 
-                        let bestCamera = devices.find(d => { let l = d.label.toLowerCase(); return (l.includes('back') || l.includes('trasera')) && !l.includes('ultra') && !l.includes('macro'); });
-                        if (!bestCamera) bestCamera = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('trasera')) || devices[0];
+                        let bestCamera = devices.find(d => { let l = d.label.toLowerCase(); return (l.includes('back') || l.includes('trasera')) && !l.includes('ultra'); });
+                        if (!bestCamera) bestCamera = devices[0];
                         
                         currentCameraId = bestCamera.id; select.value = currentCameraId;
                         startHtml5ScannerProcess(currentCameraId);
-                    } else { badge.innerText = 'No se detectó cámara'; showAlert("Error", "Sin cámaras.", "error"); }
-                } catch (err) { badge.innerText = 'Cámara Bloqueada'; showAlert("Cámara", "Permisos requeridos en HTTPS.", "error"); }
+                    } else { badge.innerText = 'No se detectó cámara'; }
+                } catch (err) { badge.innerText = 'Cámara Bloqueada'; }
             }, 300);
         }
 
         function startHtml5ScannerProcess(cameraId) {
             const badge = document.getElementById('scannerStatusBadge'); badge.innerText = 'Enfocando...';
-            const config = { fps: 10, qrbox: { width: Math.floor(Math.min(window.innerWidth * 0.8, 300)), height: Math.floor(Math.min(window.innerWidth * 0.8, 300) * 0.5) }, aspectRatio: 1.0, disableFlip: false, formatsToSupport: [ Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8, Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E, Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39 ] };
+            const config = { fps: 10, qrbox: { width: 250, height: 150 }, aspectRatio: 1.0, disableFlip: false, formatsToSupport: [ Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.CODE_128 ] };
             html5QrCode.start(cameraId, config, (decodedText) => processScannedCode(decodedText), () => {}).then(() => {
                 badge.innerText = 'Escaneando zona verde'; torchOn = false; updateTorchButtonUI();
-            }).catch(err => {
-                 if(String(err).includes('OverconstrainedError')) { html5QrCode.start({ facingMode: "environment" }, config, processScannedCode, undefined); }
             });
         }
 
         async function changeCameraDevice() { currentCameraId = document.getElementById('cameraSelect').value; if (html5QrCode && html5QrCode.isScanning) { await html5QrCode.stop(); } startHtml5ScannerProcess(currentCameraId); }
+        
         function processScannedCode(text) {
             const now = Date.now(); if (now - lastScanTime < 1500) return; lastScanTime = now; playChingSound();
-            if (activeInputForScanner) { document.getElementById(activeInputForScanner).value = text; stopScanner(); } else { handleScannedCode(text); }
+            
+            // Badge verde flotante con el código detectado
+            const badge = document.getElementById('scannerStatusBadge');
+            if(badge) {
+                badge.innerText = `¡Detectado: ${text}!`;
+                badge.className = "absolute top-4 left-4 bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg z-10 shadow-lg";
+            }
+
+            if (activeInputForScanner) { document.getElementById(activeInputForScanner).value = text; stopScanner(); } 
+            else { handleScannedCode(text); }
         }
+
         function handleScannedCode(code) {
             const p = products.find(prod => prod.barcode === code);
-            if (p) { handleProductClick(p.id); } else { stopScanner(); showAlert("No registrado", `Código: ${code}`, "warning"); openAddQuickProductModal(); document.getElementById('prodBarcode').value = code; }
+            if (p) { handleProductClick(p.id); setTimeout(stopScanner, 800); } 
+            else { stopScanner(); showAlert("No registrado", `Código: ${code}`, "warning"); openAddQuickProductModal(); document.getElementById('prodBarcode').value = code; }
         }
+
         function stopScanner() { if (html5QrCode && html5QrCode.isScanning) { html5QrCode.stop().then(() => html5QrCode.clear()); } torchOn = false; updateTorchButtonUI(); activeInputForScanner = null; document.getElementById('scannerModal').classList.add('hidden'); }
-        async function toggleTorch() { if (html5QrCode && html5QrCode.isScanning) { try { torchOn = !torchOn; await html5QrCode.applyVideoConstraints({ advanced: [{ torch: torchOn }] }); updateTorchButtonUI(); } catch (err) { torchOn = !torchOn; showAlert("Flash no soportado", "No se pudo activar.", "warning"); } } }
+        async function toggleTorch() { if (html5QrCode && html5QrCode.isScanning) { try { torchOn = !torchOn; await html5QrCode.applyVideoConstraints({ advanced: [{ torch: torchOn }] }); updateTorchButtonUI(); } catch (err) {} } }
         function updateTorchButtonUI() {
             const btn = document.getElementById('torchBtn'); const lbl = document.getElementById('torchLabel');
-            if (torchOn) { btn.className = "bg-amber-500 text-slate-950 px-5 py-3 rounded-xl text-sm font-bold transition border border-amber-400 flex items-center space-x-2"; lbl.innerText = "Flash: ON"; } 
-            else { btn.className = "bg-amber-600/20 text-amber-500 hover:bg-amber-600/30 px-5 py-3 rounded-xl text-sm font-bold transition border border-amber-500/30 flex items-center space-x-2"; lbl.innerText = "Flash: OFF"; }
+            if (torchOn) { btn.className = "bg-amber-500 text-slate-950 px-5 py-3 rounded-xl text-sm font-bold border border-amber-400 flex items-center space-x-2"; lbl.innerText = "Flash: ON"; } 
+            else { btn.className = "bg-amber-600/20 text-amber-500 px-5 py-3 rounded-xl text-sm font-bold border border-amber-500/30 flex items-center space-x-2"; lbl.innerText = "Flash: OFF"; }
         }
 
         function convertCurrency(type) {
@@ -1480,13 +1490,12 @@
             else if (type === 'eur') { let v = parseFloat(e.value) || 0; let usd = v * (rates.eur / currentRate); u.value = usd.toFixed(2); b.value = (v * rates.eur).toFixed(2); }
         }
 
-        // Nueva función Universal de Copiado para Inputs
         function copyAmountUniversal(inputId, btn) {
             const input = document.getElementById(inputId);
             if (!input.value) return;
             copyTextUniversal(input.value, `Valor copiado: ${input.value}`);
             const icon = btn.querySelector('i');
-            icon.className = 'fa-solid fa-check text-emerald-500 text-lg';
+            icon.className = 'fa-solid fa-check text-emerald-400 text-lg';
             setTimeout(() => { icon.className = 'fa-regular fa-copy text-lg pointer-events-none'; }, 1500);
         }
 
@@ -1502,7 +1511,7 @@
 
             products.filter(p => p.name.toLowerCase().includes(q) || p.barcode.includes(q)).forEach(p => {
                 const tr = document.createElement('tr'); tr.className = 'app-table-row hover:opacity-90 transition border-b';
-                tr.innerHTML = `<td class="p-4 font-mono text-xs text-slate-400">${p.barcode}</td><td class="p-4 font-bold">${p.name}</td><td class="p-4">$${(p.costUsd||0).toFixed(2)}</td><td class="p-4">${p.margin||0}%</td><td class="p-4 font-bold text-emerald-600 dark:text-emerald-400">$${p.priceUsd.toFixed(2)}</td><td class="p-4">Bs. ${(p.priceUsd * currentRate).toFixed(2)}</td><td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${p.stock>5?'bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400':'bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400'}">${p.stock}</span></td><td class="p-4 text-right space-x-2"><button onclick="openEditProductModal(${p.id})" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-pen"></i></button><button onclick="deleteProduct(${p.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td>`;
+                tr.innerHTML = `<td class="p-4 font-mono text-xs text-slate-400">${p.barcode}</td><td class="p-4 font-bold">${p.name}</td><td class="p-4">$${(p.costUsd||0).toFixed(2)}</td><td class="p-4">${p.margin||0}%</td><td class="p-4 font-bold text-emerald-400">$${p.priceUsd.toFixed(2)}</td><td class="p-4">Bs. ${(p.priceUsd * currentRate).toFixed(2)}</td><td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${p.stock>5?'bg-emerald-950 text-emerald-400':'bg-rose-950 text-rose-400'}">${p.stock}</span></td><td class="p-4 text-right space-x-2"><button onclick="openEditProductModal(${p.id})" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-pen"></i></button><button onclick="deleteProduct(${p.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td>`;
                 tbody.appendChild(tr);
             });
 
@@ -1541,7 +1550,7 @@
             const doc = document.getElementById('clientDoc').value.trim(); const name = document.getElementById('clientName').value.trim(); const phone = document.getElementById('clientPhone').value.trim(); const address = document.getElementById('clientAddress').value.trim();
             if (!doc || !name) { showAlert("Error", "Incompleto.", "error"); return; }
             const newC = { id: Date.now(), doc, name, phone: phone, address: address }; clients.push(newC); currentSelectedClientId = newC.id;
-            saveToLocalStorage(); closeClientModal(); renderClientsTable(); document.getElementById('posClientSearchInput').value = newC.name; document.getElementById('clientDoc').value = ''; document.getElementById('clientName').value = ''; document.getElementById('clientPhone').value = ''; document.getElementById('clientAddress').value = ''; showAlert("Éxito", "Cliente guardado y asignado.", "success");
+            saveToLocalStorage(); closeClientModal(); renderClientsTable(); document.getElementById('posClientSearchInput').value = newC.name; document.getElementById('clientDoc').value = ''; document.getElementById('clientName').value = ''; document.getElementById('clientPhone').value = ''; document.getElementById('clientAddress').value = ''; showAlert("Éxito", "Cliente guardado.", "success");
         }
         function deleteClient(id) { if (id === 1) return; clients = clients.filter(c => c.id !== id); saveToLocalStorage(); renderClientsTable(); }
         
@@ -1550,7 +1559,7 @@
         function renderHistoryTable() {
             const tbody = document.getElementById('historyTableBody'); tbody.innerHTML = '';
             if (salesHistory.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">Sin ventas</td></tr>`; return; }
-            salesHistory.forEach(s => { const tr = document.createElement('tr'); tr.className = 'app-table-row hover:opacity-90 transition border-b'; tr.innerHTML = `<td class="p-4 font-bold">${s.id}</td><td class="p-4 text-xs text-slate-400">${s.date}</td><td class="p-4">${s.method}</td><td class="p-4 font-bold text-emerald-600 dark:text-emerald-400">$${s.totalUsd.toFixed(2)}</td><td class="p-4">Bs. ${s.totalBs.toFixed(2)}</td><td class="p-4 text-right"><button onclick="showInvoiceModalById('${s.id}')" class="text-emerald-600 dark:text-emerald-400 font-bold text-xs">Ver</button></td>`; tbody.appendChild(tr); });
+            salesHistory.forEach(s => { const tr = document.createElement('tr'); tr.className = 'app-table-row hover:opacity-90 transition border-b'; tr.innerHTML = `<td class="p-4 font-bold">${s.id}</td><td class="p-4 text-xs text-slate-400">${s.date}</td><td class="p-4">${s.method}</td><td class="p-4 font-bold text-emerald-400">$${s.totalUsd.toFixed(2)}</td><td class="p-4">Bs. ${s.totalBs.toFixed(2)}</td><td class="p-4 text-right"><button onclick="showInvoiceModalById('${s.id}')" class="text-emerald-400 font-bold text-xs">Ver</button></td>`; tbody.appendChild(tr); });
         }
         function showInvoiceModalById(id) { const s = salesHistory.find(item => item.id === id); if (s) showInvoiceModal(s); }
         function renderStats() {
@@ -1563,13 +1572,13 @@
         function showAlert(title, msg, type) {
             document.getElementById('modalTitle').innerText = title; document.getElementById('modalMessage').innerText = msg;
             const icon = document.getElementById('modalIcon'); document.getElementById('modalCancelBtn').classList.add('hidden'); confirmCallback = null;
-            icon.className = type === 'success' ? 'w-12 h-12 rounded-full flex items-center justify-center mb-4 text-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50' : (type === 'warning' ? 'w-12 h-12 rounded-full flex items-center justify-center mb-4 text-xl bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50' : 'w-12 h-12 rounded-full flex items-center justify-center mb-4 text-xl bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50');
+            icon.className = type === 'success' ? 'w-12 h-12 rounded-full flex items-center justify-center mb-4 text-xl bg-emerald-950 text-emerald-400 border border-emerald-800/50' : (type === 'warning' ? 'w-12 h-12 rounded-full flex items-center justify-center mb-4 text-xl bg-amber-950 text-amber-400 border border-amber-800/50' : 'w-12 h-12 rounded-full flex items-center justify-center mb-4 text-xl bg-rose-950 text-rose-400 border border-rose-800/50');
             icon.innerHTML = type === 'success' ? '<i class="fa-solid fa-check"></i>' : (type === 'warning' ? '<i class="fa-solid fa-triangle-exclamation"></i>' : '<i class="fa-solid fa-xmark"></i>');
             document.getElementById('customModal').classList.remove('hidden');
         }
         function showConfirmModal(title, msg, cb) {
             document.getElementById('modalTitle').innerText = title; document.getElementById('modalMessage').innerText = msg;
-            const icon = document.getElementById('modalIcon'); icon.className = 'w-12 h-12 rounded-full flex items-center justify-center mb-4 text-xl bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50'; icon.innerHTML = '<i class="fa-solid fa-circle-question"></i>';
+            const icon = document.getElementById('modalIcon'); icon.className = 'w-12 h-12 rounded-full flex items-center justify-center mb-4 text-xl bg-amber-950 text-amber-400 border border-amber-800/50'; icon.innerHTML = '<i class="fa-solid fa-circle-question"></i>';
             document.getElementById('modalCancelBtn').classList.remove('hidden'); confirmCallback = cb; document.getElementById('customModal').classList.remove('hidden');
         }
         function closeModal(confirmed) { document.getElementById('customModal').classList.add('hidden'); if (confirmed && confirmCallback) confirmCallback(); confirmCallback = null; }
