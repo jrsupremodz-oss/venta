@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="es" id="htmlRoot" data-theme="dark">
 <head>
@@ -2336,5 +2335,13 @@
 
     </script>
 </body>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('Service Worker activo y listo.'))
+        .catch(err => console.log('Error al registrar el Service Worker:', err));
+    });
+  }
+</script>
 </html>
-```
