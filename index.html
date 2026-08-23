@@ -159,10 +159,21 @@
                         </div>
                     </div>
                     
-                    <button onclick="confirmPaymentAndUnlock()" class="w-full bg-[#25D366] hover:bg-[#1ebe57] text-white font-bold py-4 rounded-xl shadow-lg shadow-[#25D366]/30 transition text-sm uppercase tracking-wider flex items-center justify-center space-x-2 mt-2">
+                    <button onclick="sendPaymentProof()" class="w-full bg-[#25D366] hover:bg-[#1ebe57] text-white font-bold py-4 rounded-xl shadow-lg shadow-[#25D366]/30 transition text-sm uppercase tracking-wider flex items-center justify-center space-x-2 mt-2">
                         <i class="fa-brands fa-whatsapp text-lg"></i>
                         <span>Enviar Comprobante</span>
                     </button>
+
+                    <!-- NUEVO: Campo para el código de renovación -->
+                    <div class="mt-4 pt-4 border-t border-slate-700/50 space-y-2">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Código de Renovación</label>
+                        <div class="flex space-x-2">
+                            <input type="text" id="renewalCodeInput" placeholder="Ingrese el código aquí..." class="flex-1 p-3.5 rounded-xl bg-[#1e293b] border border-[#334155] text-white focus:border-amber-500 focus:outline-none transition text-center font-mono tracking-widest uppercase">
+                            <button onclick="verifyRenewalCode()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-5 rounded-xl transition shadow-lg shadow-amber-600/30">
+                                <i class="fa-solid fa-unlock text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
 
                     <!-- Botón de Gracia (Oculto si se vencen los 3 días) -->
                     <button id="btnGracePeriod" onclick="useGracePeriod()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3.5 rounded-xl border border-slate-700 transition text-sm uppercase tracking-wider hidden">
@@ -171,7 +182,7 @@
                 </div>
                 
                 <div class="mt-4 text-center text-[10px] text-slate-500 leading-tight">
-                    El sistema utiliza reinicio inteligente. Al pagar, tu mes iniciará completamente a partir de hoy.
+                    El sistema utiliza reinicio inteligente. Al ingresar su código, tu mes iniciará completamente a partir de hoy.
                 </div>
             </div>
         </div>
@@ -239,6 +250,42 @@
             <div class="flex space-x-2 pt-2">
                 <button onclick="shareInvoice()" class="w-1/2 bg-sky-600 hover:bg-sky-500 text-white font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-1"><i class="fa-solid fa-copy"></i> <span>Copiar Resumen</span></button>
                 <button onclick="closeInvoiceModal()" class="w-1/2 app-btn-secondary font-bold py-2.5 rounded-xl text-xs transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalles de Deuda / Fiado -->
+    <div id="debtDetailsModal" class="fixed inset-0 z-[95] flex items-center justify-center bg-black/90 backdrop-blur-md hidden p-4">
+        <div class="app-modal border rounded-2xl p-6 max-w-md w-full mx-auto shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="text-center pb-3 border-b border-slate-200 dark:border-slate-800">
+                <h3 class="font-extrabold text-lg text-emerald-600 dark:text-emerald-400"><i class="fa-solid fa-book-open mr-2"></i>Detalle de Fiado</h3>
+                <p id="detDebtClient" class="text-sm font-bold mt-1">Cliente: </p>
+                <p id="detDebtDate" class="text-xs text-slate-500 dark:text-slate-400">Fecha: </p>
+            </div>
+            
+            <div id="detDebtItemsContainer" class="border-t border-b border-slate-200 dark:border-slate-800 py-2">
+                <table class="w-full text-xs">
+                    <thead>
+                        <tr class="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+                            <th class="pb-1">Cant/Peso</th>
+                            <th class="pb-1">Producto</th>
+                            <th class="pb-1 text-right">Monto ($)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detDebtItemsList" class="divide-y divide-slate-200 dark:divide-slate-800/60"></tbody>
+                </table>
+            </div>
+            <div id="detDebtManualDesc" class="hidden text-sm text-center py-4 text-slate-500 italic">
+                (Este fiado fue registrado manualmente. No hay productos específicos)
+            </div>
+            
+            <div class="space-y-1 text-xs pt-1">
+                <div class="flex justify-between font-extrabold text-base text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 p-2 rounded-xl border border-emerald-200 dark:border-emerald-800/40">
+                    <span>Monto Restante USD:</span> <span id="detDebtTotalUsd">$0.00</span>
+                </div>
+            </div>
+            <div class="flex pt-2">
+                <button onclick="closeDebtDetailsModal()" class="w-full app-btn-secondary font-bold py-2.5 rounded-xl text-xs transition">Cerrar</button>
             </div>
         </div>
     </div>
@@ -321,6 +368,36 @@
         </div>
     </div>
 
+    <!-- Modal Abono de Deuda -->
+    <div id="abonoModal" class="fixed inset-0 z-[95] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden p-4">
+        <div class="app-modal border rounded-2xl p-6 max-w-sm w-full mx-auto shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 class="text-lg font-bold text-emerald-600 dark:text-emerald-400"><i class="fa-solid fa-hand-holding-dollar mr-2"></i>Abonar a Deuda</h3>
+                <button onclick="closeAbonoModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-3">
+                <div class="text-sm">
+                    <p class="text-slate-500">Cliente: <span id="abonoClientName" class="font-bold text-slate-700 dark:text-slate-300">---</span></p>
+                    <p class="text-slate-500">Deuda actual: <span id="abonoDebtAmount" class="font-bold text-rose-500">$0.00</span></p>
+                </div>
+                <div class="bg-slate-100 dark:bg-slate-800/50 p-3 rounded-xl space-y-3 border border-slate-200 dark:border-slate-800">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Abono en Dólares ($):</label>
+                        <input type="number" step="0.01" id="abonoUsd" oninput="calcAbonoValue('usd')" placeholder="0.00" class="w-full p-2.5 rounded-xl app-input border text-sm font-bold text-emerald-600 dark:text-emerald-400 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Abono equivalente en Bolívares (Bs):</label>
+                        <input type="number" step="0.01" id="abonoBs" oninput="calcAbonoValue('bs')" placeholder="0.00" class="w-full p-2.5 rounded-xl app-input border text-sm focus:outline-none">
+                    </div>
+                </div>
+            </div>
+            <div class="flex space-x-3 pt-2">
+                <button onclick="closeAbonoModal()" class="w-1/2 app-btn-secondary font-semibold py-3 rounded-xl text-sm border">Cancelar</button>
+                <button onclick="confirmAbono()" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-sm shadow-lg">Abonar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Header Principal -->
     <header id="mainHeader" class="app-card border-b sticky top-0 z-40 shadow-sm w-full hidden">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -379,7 +456,7 @@
             </div>
             <nav class="flex-1 p-4 space-y-1.5 overflow-y-auto">
                 <button onclick="switchTab('pos'); toggleSidebar();" id="nav-pos" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"><i class="fa-solid fa-cash-register w-5 text-center text-lg"></i><span>Punto de Venta (POS)</span></button>
-                <button onclick="switchTab('debts'); toggleSidebar();" id="nav-debts" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition app-hover-item"><i class="fa-solid fa-book-open w-5 text-center text-lg text-amber-500"></i><span>Cuentas por Cobrar (Fiado)</span></button>
+                <button onclick="switchTab('debts'); toggleSidebar();" id="nav-debts" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition app-hover-item"><i class="fa-solid fa-book-open w-5 text-center text-lg"></i><span>Cuentas por Cobrar (Fiado)</span></button>
                 <button onclick="switchTab('inventory'); toggleSidebar();" id="nav-inventory" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition app-hover-item"><i class="fa-solid fa-boxes-stacked w-5 text-center text-lg"></i><span>Inventario y Stock</span></button>
                 <button onclick="switchTab('clients'); toggleSidebar();" id="nav-clients" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition app-hover-item"><i class="fa-solid fa-users w-5 text-center text-lg"></i><span>Clientes</span></button>
                 <button onclick="switchTab('history'); toggleSidebar();" id="nav-history" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition app-hover-item"><i class="fa-solid fa-clock-rotate-left w-5 text-center text-lg"></i><span>Historial de Ventas</span></button>
@@ -489,10 +566,10 @@
             <div id="tab-debts" class="space-y-6 hidden w-full">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h2 class="font-bold text-xl"><i class="fa-solid fa-book-open text-amber-500 mr-2"></i>Cuentas por Cobrar (Fiado)</h2>
+                        <h2 class="font-bold text-xl"><i class="fa-solid fa-book-open text-emerald-500 mr-2"></i>Cuentas por Cobrar (Fiado)</h2>
                         <p class="text-sm text-slate-400">Administra los créditos pendientes de tus clientes.</p>
                     </div>
-                    <button onclick="openManualDebtModal()" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-md transition flex items-center space-x-2">
+                    <button onclick="openManualDebtModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-md transition flex items-center space-x-2">
                         <i class="fa-solid fa-plus"></i><span>Registrar Nuevo Fiado</span>
                     </button>
                 </div>
@@ -506,8 +583,7 @@
                                     <th class="p-4">Cliente</th>
                                     <th class="p-4">Descripción / Venta</th>
                                     <th class="p-4">Monto ($)</th>
-                                    <th class="p-4">Monto (Bs)</th>
-                                    <th class="p-4 text-right">Acción</th>
+                                    <th class="p-4 text-center">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="debtsTableBody" class="divide-y divide-slate-200 dark:divide-slate-800">
@@ -743,57 +819,11 @@
         </main>
     </div>
 
-    <!-- Modal Checkout -->
-    <div id="checkoutModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden p-4">
-        <div class="app-modal border rounded-2xl p-6 max-w-lg w-full mx-auto shadow-2xl space-y-5">
-            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
-                <h3 class="text-lg font-bold"><i class="fa-solid fa-file-invoice-dollar mr-2 text-emerald-500"></i>Procesar Pago y Factura</h3>
-                <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-400">Cliente Facturado:</label>
-                    <select id="checkoutClientSelect" class="w-full mt-1 p-2.5 rounded-xl app-input border text-sm font-bold focus:outline-none pointer-events-none" disabled></select>
-                </div>
-                <div class="app-input border p-4 rounded-xl space-y-1">
-                    <div class="flex justify-between text-sm"><span class="text-slate-400">Monto USD:</span> <span id="modalCheckoutUsd" class="font-bold">$0.00</span></div>
-                    <div class="flex justify-between text-base font-extrabold text-emerald-600 dark:text-emerald-400"><span>Monto VES (<span id="checkoutActiveRateName" class="text-xs uppercase">BCV</span>):</span><span id="modalCheckoutBs">Bs. 0.00</span></div>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Método de Pago:</label>
-                    <!-- Añadido botón para Fiado / Crédito -->
-                    <div class="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                        <button onclick="setPaymentMethod('Divisas ($)')" id="pay-divisas" class="pay-method-btn p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-bold flex flex-col items-center space-y-1"><i class="fa-solid fa-money-bill-wave text-lg"></i><span>Divisas</span></button>
-                        <button onclick="setPaymentMethod('Pago Móvil')" id="pay-pagomovil" class="pay-method-btn p-3 rounded-xl border-2 border-slate-300 dark:border-slate-700 app-input text-xs font-bold flex flex-col items-center space-y-1"><i class="fa-solid fa-mobile-screen-button text-lg"></i><span>Pago Móvil</span></button>
-                        <button onclick="setPaymentMethod('Punto de Venta')" id="pay-punto" class="pay-method-btn p-3 rounded-xl border-2 border-slate-300 dark:border-slate-700 app-input text-xs font-bold flex flex-col items-center space-y-1"><i class="fa-solid fa-credit-card text-lg"></i><span>Punto Tarj</span></button>
-                        <button onclick="setPaymentMethod('Zelle / Otros')" id="pay-zelle" class="pay-method-btn p-3 rounded-xl border-2 border-slate-300 dark:border-slate-700 app-input text-xs font-bold flex flex-col items-center space-y-1"><i class="fa-solid fa-building-columns text-lg"></i><span>Zelle/Efe</span></button>
-                        
-                        <button onclick="setPaymentMethod('Fiado / Crédito')" id="pay-fiado" class="pay-method-btn p-3 rounded-xl border-2 border-slate-300 dark:border-slate-700 app-input text-xs font-bold flex flex-col items-center space-y-1"><i class="fa-solid fa-book-open text-lg"></i><span>Fiado</span></button>
-                    </div>
-                </div>
-                <div class="space-y-3 pt-2">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div><label class="block text-xs font-bold text-slate-400 mb-1">Recibido ($):</label><input type="number" id="receivedUsd" oninput="calculateChange()" placeholder="0.00" class="w-full p-2.5 rounded-xl app-input border text-sm"></div>
-                        <div><label class="block text-xs font-bold text-slate-400 mb-1">Recibido (Bs):</label><input type="number" id="receivedBs" oninput="calculateChangeBs()" placeholder="0.00" class="w-full p-2.5 rounded-xl app-input border text-sm"></div>
-                    </div>
-                    <div class="app-input border p-3 rounded-xl flex justify-between items-center text-sm font-bold">
-                        <span>Vuelto:</span>
-                        <div class="text-right"><div id="changeUsd" class="text-emerald-600 dark:text-emerald-400">$0.00</div><div id="changeBs" class="text-xs text-slate-400">Bs. 0.00</div></div>
-                    </div>
-                </div>
-            </div>
-            <div class="flex space-x-3 pt-2">
-                <button onclick="closeCheckoutModal()" class="w-1/2 app-btn-secondary font-semibold py-3 rounded-xl text-sm border">Cancelar</button>
-                <button onclick="completeSale()" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm flex items-center justify-center space-x-2"><i class="fa-solid fa-check"></i><span>Completar Venta</span></button>
-            </div>
-        </div>
-    </div>
-
     <!-- Modal Registrar Fiado Manual -->
     <div id="manualDebtModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden p-4">
         <div class="app-modal border rounded-2xl p-6 max-w-sm w-full mx-auto shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
-                <h3 class="text-lg font-bold text-amber-500">Registrar Fiado</h3>
+                <h3 class="text-lg font-bold text-emerald-600 dark:text-emerald-400">Registrar Fiado</h3>
                 <button onclick="closeManualDebtModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="space-y-3">
@@ -801,12 +831,12 @@
                     <label class="block text-xs font-bold text-slate-400 mb-1">Cliente:</label>
                     <select id="debtClientSelect" class="w-full p-2.5 rounded-xl app-input border text-sm"></select>
                 </div>
-                <div><label class="block text-xs font-bold text-slate-400 mb-1">Monto en Dólares ($):</label><input type="number" step="0.01" id="debtAmountUsd" placeholder="0.00" class="w-full p-2.5 rounded-xl app-input border text-sm font-bold text-amber-500"></div>
+                <div><label class="block text-xs font-bold text-slate-400 mb-1">Monto en Dólares ($):</label><input type="number" step="0.01" id="debtAmountUsd" placeholder="0.00" class="w-full p-2.5 rounded-xl app-input border text-sm font-bold text-emerald-600 dark:text-emerald-400"></div>
                 <div><label class="block text-xs font-bold text-slate-400 mb-1">Descripción / Concepto:</label><input type="text" id="debtDesc" placeholder="Ej. Paquete de harina y queso" class="w-full p-2.5 rounded-xl app-input border text-sm"></div>
             </div>
             <div class="flex space-x-3 pt-2">
                 <button onclick="closeManualDebtModal()" class="w-1/2 app-btn-secondary font-semibold py-3 rounded-xl text-sm border">Cancelar</button>
-                <button onclick="saveManualDebt()" class="w-1/2 bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm">Guardar Fiado</button>
+                <button onclick="saveManualDebt()" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm">Guardar Fiado</button>
             </div>
         </div>
     </div>
@@ -872,26 +902,75 @@
         </div>
     </div>
 
+    <!-- Modal Checkout -->
+    <div id="checkoutModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm hidden p-4">
+        <div class="app-modal border rounded-2xl p-6 max-w-lg w-full mx-auto shadow-2xl space-y-5">
+            <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 class="text-lg font-bold"><i class="fa-solid fa-file-invoice-dollar mr-2 text-emerald-500"></i>Procesar Pago y Factura</h3>
+                <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400">Cliente Facturado:</label>
+                    <select id="checkoutClientSelect" class="w-full mt-1 p-2.5 rounded-xl app-input border text-sm font-bold focus:outline-none pointer-events-none" disabled></select>
+                </div>
+                <div class="app-input border p-4 rounded-xl space-y-1">
+                    <div class="flex justify-between text-sm"><span class="text-slate-400">Monto USD:</span> <span id="modalCheckoutUsd" class="font-bold">$0.00</span></div>
+                    <div class="flex justify-between text-base font-extrabold text-emerald-600 dark:text-emerald-400"><span>Monto VES (<span id="checkoutActiveRateName" class="text-xs uppercase">BCV</span>):</span><span id="modalCheckoutBs">Bs. 0.00</span></div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Método de Pago:</label>
+                    <!-- Añadido botón para Fiado / Crédito -->
+                    <div class="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                        <button onclick="setPaymentMethod('Divisas ($)')" id="pay-divisas" class="pay-method-btn p-3 rounded-xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-bold flex flex-col items-center space-y-1"><i class="fa-solid fa-money-bill-wave text-lg"></i><span>Divisas</span></button>
+                        <button onclick="setPaymentMethod('Pago Móvil')" id="pay-pagomovil" class="pay-method-btn p-3 rounded-xl border-2 border-slate-300 dark:border-slate-700 app-input text-xs font-bold flex flex-col items-center space-y-1"><i class="fa-solid fa-mobile-screen-button text-lg"></i><span>Pago Móvil</span></button>
+                        <button onclick="setPaymentMethod('Punto de Venta')" id="pay-punto" class="pay-method-btn p-3 rounded-xl border-2 border-slate-300 dark:border-slate-700 app-input text-xs font-bold flex flex-col items-center space-y-1"><i class="fa-solid fa-credit-card text-lg"></i><span>Punto Tarj</span></button>
+                        <button onclick="setPaymentMethod('Zelle / Otros')" id="pay-zelle" class="pay-method-btn p-3 rounded-xl border-2 border-slate-300 dark:border-slate-700 app-input text-xs font-bold flex flex-col items-center space-y-1"><i class="fa-solid fa-building-columns text-lg"></i><span>Zelle/Efe</span></button>
+                        
+                        <button onclick="setPaymentMethod('Fiado / Crédito')" id="pay-fiado" class="pay-method-btn p-3 rounded-xl border-2 border-slate-300 dark:border-slate-700 app-input text-xs font-bold flex flex-col items-center space-y-1"><i class="fa-solid fa-book-open text-lg"></i><span>Fiado</span></button>
+                    </div>
+                </div>
+                <div class="space-y-3 pt-2">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="block text-xs font-bold text-slate-400 mb-1">Recibido ($):</label><input type="number" id="receivedUsd" oninput="calculateChange()" placeholder="0.00" class="w-full p-2.5 rounded-xl app-input border text-sm"></div>
+                        <div><label class="block text-xs font-bold text-slate-400 mb-1">Recibido (Bs):</label><input type="number" id="receivedBs" oninput="calculateChangeBs()" placeholder="0.00" class="w-full p-2.5 rounded-xl app-input border text-sm"></div>
+                    </div>
+                    <div class="app-input border p-3 rounded-xl flex justify-between items-center text-sm font-bold">
+                        <span>Vuelto:</span>
+                        <div class="text-right"><div id="changeUsd" class="text-emerald-600 dark:text-emerald-400">$0.00</div><div id="changeBs" class="text-xs text-slate-400">Bs. 0.00</div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex space-x-3 pt-2">
+                <button onclick="closeCheckoutModal()" class="w-1/2 app-btn-secondary font-semibold py-3 rounded-xl text-sm border">Cancelar</button>
+                <button onclick="completeSale()" class="w-1/2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-lg transition text-sm flex items-center justify-center space-x-2"><i class="fa-solid fa-check"></i><span>Completar Venta</span></button>
+            </div>
+        </div>
+    </div>
+
     <!-- Script Principal -->
     <script>
+        // ==========================================
+        // CÓDIGO DE RENOVACIÓN MENSUAL (AQUÍ DEBES CAMBIARLO CADA MES)
+        // ==========================================
+        // Aquí puedes escribir la palabra secreta que le enviarás por WhatsApp al cliente
+        const MONTHLY_RENEWAL_CODE = "RENOVAR2026"; 
+        // ==========================================
+
+
         // ==========================================
         // SISTEMA DE PORTAPAPELES (COPIAR) INFALIBLE
         // ==========================================
         function fallbackCopyTextToClipboard(text) {
             var textArea = document.createElement("textarea");
             textArea.value = text;
-            // Evitar scroll visual al crear el textarea
             textArea.style.top = "0";
             textArea.style.left = "0";
             textArea.style.position = "fixed";
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
-            try {
-                document.execCommand('copy');
-            } catch (err) {
-                console.error('Fallback: Oops, unable to copy', err);
-            }
+            try { document.execCommand('copy'); } catch (err) { console.error('Fallback: Oops, unable to copy', err); }
             document.body.removeChild(textArea);
         }
 
@@ -918,117 +997,63 @@
         const SUBSCRIPTION_DAYS = 30;
         const GRACE_PERIOD_DAYS = 3;
 
-        let licenseSystem = {
-            isActivated: false,
-            registeredName: "",
-            activationDate: null,
-            nextBillingDate: null,
-            generatedCodes: [],
-            history: []
-        };
+        let licenseSystem = { isActivated: false, registeredName: "", activationDate: null, nextBillingDate: null, generatedCodes: [], history: [] };
 
         function togglePasswordVisibility(id) {
             const el = document.getElementById(id);
-            if(el.type === 'password') el.type = 'text';
-            else el.type = 'password';
+            if(el.type === 'password') el.type = 'text'; else el.type = 'password';
         }
 
         function loadLicenseSystem() {
             const data = localStorage.getItem('ve_license_pro');
-            if (data) {
-                licenseSystem = JSON.parse(data);
-            }
+            if (data) { licenseSystem = JSON.parse(data); }
         }
 
-        function saveLicenseSystem() {
-            localStorage.setItem('ve_license_pro', JSON.stringify(licenseSystem));
-        }
+        function saveLicenseSystem() { localStorage.setItem('ve_license_pro', JSON.stringify(licenseSystem)); }
 
         function processActivation() {
             const name = document.getElementById('actClientName').value.trim();
             const code = document.getElementById('actCode').value.trim().toUpperCase();
             
-            if (!name || !code) {
-                showAlert("Campos Vacíos", "Por favor ingrese el Nombre de Registro y el Código.", "error");
-                return;
-            }
-
-            if (code === MASTER_KEY) {
-                activateApp(name, "LLAVE_MAESTRA");
-                return;
-            }
-
+            if (!name || !code) { showAlert("Campos Vacíos", "Por favor ingrese el Nombre de Registro y el Código.", "error"); return; }
+            if (code === MASTER_KEY) { activateApp(name, "LLAVE_MAESTRA"); return; }
             const codeIndex = licenseSystem.generatedCodes.findIndex(c => c.code === code && !c.used);
-            if (codeIndex !== -1) {
-                licenseSystem.generatedCodes[codeIndex].used = true;
-                activateApp(name, code);
-                return;
-            }
-
-            if (code.startsWith("VE-PRO-") && code.length >= 10) {
-                 activateApp(name, code);
-                 return;
-            }
-
+            if (codeIndex !== -1) { licenseSystem.generatedCodes[codeIndex].used = true; activateApp(name, code); return; }
+            if (code.startsWith("VE-PRO-") && code.length >= 10) { activateApp(name, code); return; }
             showAlert("Error de Código", "Código de activación inválido o ya utilizado.", "error");
         }
 
         function activateApp(registeredName, usedCode) {
             licenseSystem.isActivated = true;
             licenseSystem.registeredName = registeredName;
-            
-            // Lógica de Suscripción: Inicializa las fechas (Hoy + 30 Días)
             const now = Date.now();
             licenseSystem.activationDate = now;
             licenseSystem.nextBillingDate = now + (SUBSCRIPTION_DAYS * 24 * 60 * 60 * 1000);
-            
-            licenseSystem.history.unshift({
-                clientName: registeredName,
-                code: usedCode,
-                date: new Date().toLocaleString()
-            });
-
+            licenseSystem.history.unshift({ clientName: registeredName, code: usedCode, date: new Date().toLocaleString() });
             saveLicenseSystem();
-            
             document.getElementById('activationScreen').classList.add('hidden');
             document.getElementById('mainHeader').classList.remove('hidden');
             document.getElementById('mainContentArea').classList.remove('hidden');
-            
             document.getElementById('sidebarLicenseOwner').innerText = `Licencia: ${registeredName}`;
-            
-            startApp();
-            checkBillingStatus();
+            startApp(); checkBillingStatus();
         }
 
-        // --- FUNCIONES DE COBRO (CON REINICIO INTELIGENTE Y PERÍODO DE GRACIA) ---
         function checkBillingStatus() {
-            // Retrocompatibilidad: Si activó en versiones previas sin fecha de cobro,
-            // le regalamos automáticamente 30 días a partir de HOY.
-            if (!licenseSystem.nextBillingDate) {
-                licenseSystem.nextBillingDate = Date.now() + (SUBSCRIPTION_DAYS * 24 * 60 * 60 * 1000);
-                saveLicenseSystem();
-            }
-
+            if (!licenseSystem.nextBillingDate) { licenseSystem.nextBillingDate = Date.now() + (SUBSCRIPTION_DAYS * 24 * 60 * 60 * 1000); saveLicenseSystem(); }
             const now = Date.now();
             const gracePeriodEnd = licenseSystem.nextBillingDate + (GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000);
-
-            if (now >= licenseSystem.nextBillingDate) {
-                showBillingScreen(now < gracePeriodEnd);
-            }
+            if (now >= licenseSystem.nextBillingDate) { showBillingScreen(now < gracePeriodEnd); }
         }
 
         function showBillingScreen(inGracePeriod) {
             document.getElementById('monthlyBillingScreen').classList.remove('hidden');
             updateBillingAmount();
-            
             const btnGrace = document.getElementById('btnGracePeriod');
             const statusMsg = document.getElementById('billingStatusMessage');
-            
             if (inGracePeriod) {
                 const now = Date.now();
                 const gracePeriodEnd = licenseSystem.nextBillingDate + (GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000);
                 const daysLeft = Math.ceil((gracePeriodEnd - now) / (1000 * 60 * 60 * 24));
-                
                 statusMsg.innerHTML = `Su suscripción culminó. Tiene un <span class="text-amber-500 font-bold">período de gracia activo (${daysLeft} días restantes)</span>. Renueve pronto.`;
                 btnGrace.classList.remove('hidden');
             } else {
@@ -1037,145 +1062,77 @@
             }
         }
 
-        function useGracePeriod() {
-            document.getElementById('monthlyBillingScreen').classList.add('hidden');
-        }
-
-        function updateBillingAmount() {
-            const currentRate = rates.bcv || 36.50; 
-            const bsAmount = (SUBSCRIPTION_PRICE_USD * currentRate).toFixed(2);
-            document.getElementById('billingAmountBs').innerText = bsAmount;
-        }
-
+        function useGracePeriod() { document.getElementById('monthlyBillingScreen').classList.add('hidden'); }
+        function updateBillingAmount() { const currentRate = rates.bcv || 36.50; const bsAmount = (SUBSCRIPTION_PRICE_USD * currentRate).toFixed(2); document.getElementById('billingAmountBs').innerText = bsAmount; }
         function copyBillingAmount(btnElement) {
             const amount = document.getElementById('billingAmountBs').innerText;
-            copyText(amount, () => {
-                const icon = btnElement.querySelector('i');
-                icon.className = 'fa-solid fa-check text-xl';
-                setTimeout(() => { icon.className = 'fa-regular fa-copy text-xl'; }, 1500);
-            });
+            copyText(amount, () => { const icon = btnElement.querySelector('i'); icon.className = 'fa-solid fa-check text-xl'; setTimeout(() => { icon.className = 'fa-regular fa-copy text-xl'; }, 1500); });
         }
-
         function copyPagoMovilData(btnElement) {
             const pmData = "Banco Nacional de Crédito (BNC)\nCI: V-21271099\nTeléfono: 04169485195";
-            copyText(pmData, () => {
-                const originalText = btnElement.innerHTML;
-                btnElement.innerHTML = `<i class="fa-solid fa-check"></i> <span>¡Copiado!</span>`;
-                setTimeout(() => { btnElement.innerHTML = originalText; }, 2000);
-            });
+            copyText(pmData, () => { const originalText = btnElement.innerHTML; btnElement.innerHTML = `<i class="fa-solid fa-check"></i> <span>¡Copiado!</span>`; setTimeout(() => { btnElement.innerHTML = originalText; }, 2000); });
         }
-
-        function confirmPaymentAndUnlock() {
-            // REINICIO INTELIGENTE: Sin importar cuánto tardó, los nuevos 30 días empiezan a contar HOY.
-            licenseSystem.nextBillingDate = Date.now() + (SUBSCRIPTION_DAYS * 24 * 60 * 60 * 1000);
-            saveLicenseSystem();
-            
-            document.getElementById('monthlyBillingScreen').classList.add('hidden');
+        
+        // MODIFICADO: Ahora solo abre WhatsApp, no desbloquea
+        function sendPaymentProof() {
             window.open("https://wa.me/message/44PCLSJ7IE5OF1", "_blank");
         }
-        // ----------------------------------
+
+        // NUEVO: Función que verifica el código para desbloquear
+        function verifyRenewalCode() {
+            const inputCode = document.getElementById('renewalCodeInput').value.trim().toUpperCase();
+            
+            // Permite usar el código mensual o la Llave Maestra por seguridad tuya
+            if (inputCode === MONTHLY_RENEWAL_CODE.toUpperCase() || inputCode === MASTER_KEY) {
+                licenseSystem.nextBillingDate = Date.now() + (SUBSCRIPTION_DAYS * 24 * 60 * 60 * 1000);
+                saveLicenseSystem();
+                document.getElementById('monthlyBillingScreen').classList.add('hidden');
+                document.getElementById('renewalCodeInput').value = ''; // Limpia el input
+                showAlert("Suscripción Renovada", "¡Gracias! Tu suscripción ha sido renovada por 30 días más.", "success");
+            } else {
+                showAlert("Código Incorrecto", "El código ingresado no es válido. Comunícate para recibir el código de este mes.", "error");
+            }
+        }
 
         // Funciones del Panel Administrativo
-        function promptAdminAccess() {
-            document.getElementById('adminMasterKeyInput').value = '';
-            document.getElementById('adminAuthModal').classList.remove('hidden');
-            document.getElementById('adminMasterKeyInput').focus();
-        }
-
+        function promptAdminAccess() { document.getElementById('adminMasterKeyInput').value = ''; document.getElementById('adminAuthModal').classList.remove('hidden'); document.getElementById('adminMasterKeyInput').focus(); }
         function verifyAdminAccess() {
             const input = document.getElementById('adminMasterKeyInput').value;
-            if (input === MASTER_KEY) {
-                document.getElementById('adminAuthModal').classList.add('hidden');
-                document.getElementById('btnOpenAdmin').classList.add('hidden');
-                document.getElementById('adminPanelSecret').classList.remove('hidden');
-                renderAdminPanel();
-            } else {
-                showAlert("Acceso Denegado", "Llave Maestra Incorrecta.", "error");
-            }
+            if (input === MASTER_KEY) { document.getElementById('adminAuthModal').classList.add('hidden'); document.getElementById('btnOpenAdmin').classList.add('hidden'); document.getElementById('adminPanelSecret').classList.remove('hidden'); renderAdminPanel(); }
+            else { showAlert("Acceso Denegado", "Llave Maestra Incorrecta.", "error"); }
         }
-
-        function closeAdminPanel() {
-            document.getElementById('adminPanelSecret').classList.add('hidden');
-            document.getElementById('btnOpenAdmin').classList.remove('hidden');
-        }
-
+        function closeAdminPanel() { document.getElementById('adminPanelSecret').classList.add('hidden'); document.getElementById('btnOpenAdmin').classList.remove('hidden'); }
         function generateActivationCode() {
             const clientName = document.getElementById('adminNewClientName').value.trim();
-            if (!clientName) {
-                showAlert("Faltan Datos", "Ingrese el nombre del cliente para generar su código.", "error");
-                return;
-            }
-
-            const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
-            const newCode = `VE-PRO-${randomString}`;
-
-            licenseSystem.generatedCodes.unshift({
-                clientName: clientName,
-                code: newCode,
-                used: false,
-                date: new Date().toLocaleDateString()
-            });
-
-            saveLicenseSystem();
-            document.getElementById('adminNewClientName').value = '';
-            renderAdminPanel();
-            
-            copyText(newCode, () => {
-                showAlert('Código Generado', `El código ${newCode} para ${clientName} ha sido copiado al portapapeles.`, 'success');
-            });
+            if (!clientName) { showAlert("Faltan Datos", "Ingrese el nombre del cliente para generar su código.", "error"); return; }
+            const randomString = Math.random().toString(36).substring(2, 8).toUpperCase(); const newCode = `VE-PRO-${randomString}`;
+            licenseSystem.generatedCodes.unshift({ clientName: clientName, code: newCode, used: false, date: new Date().toLocaleDateString() });
+            saveLicenseSystem(); document.getElementById('adminNewClientName').value = ''; renderAdminPanel();
+            copyText(newCode, () => { showAlert('Código Generado', `El código ${newCode} para ${clientName} ha sido copiado al portapapeles.`, 'success'); });
         }
-
         function renderAdminPanel() {
-            const tbodyCodes = document.getElementById('adminCodesTable');
-            tbodyCodes.innerHTML = '';
-            if (licenseSystem.generatedCodes.length === 0) {
-                tbodyCodes.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-slate-500">No hay códigos generados</td></tr>';
-            } else {
+            const tbodyCodes = document.getElementById('adminCodesTable'); tbodyCodes.innerHTML = '';
+            if (licenseSystem.generatedCodes.length === 0) { tbodyCodes.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-slate-500">No hay códigos generados</td></tr>'; }
+            else {
                 licenseSystem.generatedCodes.forEach((item, index) => {
                     const statusClass = item.used ? "text-slate-500 line-through" : "text-emerald-400 font-bold";
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="p-2 truncate max-w-[100px] ${statusClass}">${item.clientName}</td>
-                        <td class="p-2 font-mono ${statusClass}">${item.code}</td>
-                        <td class="p-2 text-right">
-                            ${!item.used ? `<button onclick="copyAdminCode('${item.code}')" class="text-sky-400 hover:text-sky-300 mr-2" title="Copiar"><i class="fa-regular fa-copy"></i></button>` : '<span class="text-[10px] text-rose-500 bg-rose-500/10 px-1 rounded">USADO</span>'}
-                            <button onclick="deleteGeneratedCode(${index})" class="text-rose-500 hover:text-rose-400" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    `;
+                    tr.innerHTML = `<td class="p-2 truncate max-w-[100px] ${statusClass}">${item.clientName}</td><td class="p-2 font-mono ${statusClass}">${item.code}</td><td class="p-2 text-right">${!item.used ? `<button onclick="copyAdminCode('${item.code}')" class="text-sky-400 hover:text-sky-300 mr-2" title="Copiar"><i class="fa-regular fa-copy"></i></button>` : '<span class="text-[10px] text-rose-500 bg-rose-500/10 px-1 rounded">USADO</span>'}<button onclick="deleteGeneratedCode(${index})" class="text-rose-500 hover:text-rose-400" title="Eliminar"><i class="fa-solid fa-trash"></i></button></td>`;
                     tbodyCodes.appendChild(tr);
                 });
             }
-
-            const tbodyHistory = document.getElementById('adminHistoryTable');
-            tbodyHistory.innerHTML = '';
-            if (licenseSystem.history.length === 0) {
-                tbodyHistory.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-slate-500">No hay historial</td></tr>';
-            } else {
+            const tbodyHistory = document.getElementById('adminHistoryTable'); tbodyHistory.innerHTML = '';
+            if (licenseSystem.history.length === 0) { tbodyHistory.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-slate-500">No hay historial</td></tr>'; }
+            else {
                 licenseSystem.history.forEach(item => {
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="p-2 truncate max-w-[100px] text-emerald-400 font-bold">${item.clientName}</td>
-                        <td class="p-2 font-mono text-slate-400 text-[10px]">${item.code}</td>
-                        <td class="p-2 text-right text-slate-500 text-[10px]">${item.date.split(',')[0]}</td>
-                    `;
+                    tr.innerHTML = `<td class="p-2 truncate max-w-[100px] text-emerald-400 font-bold">${item.clientName}</td><td class="p-2 font-mono text-slate-400 text-[10px]">${item.code}</td><td class="p-2 text-right text-slate-500 text-[10px]">${item.date.split(',')[0]}</td>`;
                     tbodyHistory.appendChild(tr);
                 });
             }
         }
-
-        function deleteGeneratedCode(index) {
-            showConfirmModal("Confirmar", "¿Eliminar este código de la lista?", () => {
-                licenseSystem.generatedCodes.splice(index, 1);
-                saveLicenseSystem();
-                renderAdminPanel();
-            });
-        }
-
-        function copyAdminCode(text) {
-            copyText(text, () => {
-                showAlert("Copiado", "Código copiado: " + text, "success");
-            });
-        }
+        function deleteGeneratedCode(index) { showConfirmModal("Confirmar", "¿Eliminar este código de la lista?", () => { licenseSystem.generatedCodes.splice(index, 1); saveLicenseSystem(); renderAdminPanel(); }); }
+        function copyAdminCode(text) { copyText(text, () => { showAlert("Copiado", "Código copiado: " + text, "success"); }); }
         // ==========================================
 
 
@@ -1190,7 +1147,7 @@
         ];
         let cart = [];
         let salesHistory = [];
-        let debts = []; // <-- Nueva Variable para Fiados
+        let debts = []; // Fiados y Créditos
         
         let selectedPaymentMethod = "Divisas ($)";
         let calcDisplay = "0";
@@ -1200,6 +1157,7 @@
         
         let currentSelectedClientId = 1;
         let posViewMode = 'grid';
+        let currentAbonoDebtId = null; // Para pagos parciales (Abonos)
 
         let html5QrCode = null;
         let availableCameras = [];
@@ -1208,85 +1166,48 @@
         let torchOn = false;
         let lastScanTime = 0;
 
-        // INICIO PRINCIPAL DE LA APP
         window.onload = function() {
             loadLicenseSystem();
-            
-            if (!licenseSystem.isActivated) {
-                document.getElementById('activationScreen').classList.remove('hidden');
-                return; 
-            } else {
+            if (!licenseSystem.isActivated) { document.getElementById('activationScreen').classList.remove('hidden'); return; }
+            else {
                 document.getElementById('mainHeader').classList.remove('hidden');
                 document.getElementById('mainContentArea').classList.remove('hidden');
                 document.getElementById('sidebarLicenseOwner').innerText = `Licencia: ${licenseSystem.registeredName}`;
-                startApp();
-                checkBillingStatus();
+                startApp(); checkBillingStatus();
             }
         };
 
         function startApp() {
-            loadFromLocalStorage();
-            fetchOnlineRates();
-            updateRateDisplay();
-            renderPosProducts();
-            renderCart();
-            renderInventoryTable();
-            renderClientsTable();
-            renderHistoryTable();
-            renderDebtsTable(); // Renderizamos panel de fiado
-            renderStats();
-            populateClientSelect();
-            applyTheme(storeInfo.theme || 'dark');
-            setInterval(updateClock, 1000);
-            updateClock();
-            
+            loadFromLocalStorage(); fetchOnlineRates(); updateRateDisplay(); renderPosProducts(); renderCart();
+            renderInventoryTable(); renderClientsTable(); renderHistoryTable(); renderDebtsTable(); renderStats();
+            populateClientSelect(); applyTheme(storeInfo.theme || 'dark');
+            setInterval(updateClock, 1000); updateClock();
             const defClient = clients.find(c => c.id === currentSelectedClientId);
-            if(defClient) {
-                document.getElementById('posClientSearchInput').value = defClient.name;
-            }
+            if(defClient) { document.getElementById('posClientSearchInput').value = defClient.name; }
         }
 
-        function updateClock() {
-            document.getElementById('liveClock').innerText = new Date().toLocaleString('es-VE');
-        }
+        function updateClock() { document.getElementById('liveClock').innerText = new Date().toLocaleString('es-VE'); }
 
         function playChingSound() {
             try {
                 if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 if (audioCtx.state === 'suspended') audioCtx.resume();
-                
                 const now = audioCtx.currentTime;
-                const osc1 = audioCtx.createOscillator();
-                const gain1 = audioCtx.createGain();
-                osc1.type = 'sine';
-                osc1.frequency.setValueAtTime(1318.51, now);
-                gain1.gain.setValueAtTime(0.15, now);
-                gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-                osc1.connect(gain1);
-                gain1.connect(audioCtx.destination);
-                osc1.start(now);
-                osc1.stop(now + 0.3);
-
-                const osc2 = audioCtx.createOscillator();
-                const gain2 = audioCtx.createGain();
-                osc2.type = 'triangle';
-                osc2.frequency.setValueAtTime(2637.02, now + 0.08);
-                gain2.gain.setValueAtTime(0.2, now + 0.08);
-                gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-                osc2.connect(gain2);
-                gain2.connect(audioCtx.destination);
-                osc2.start(now + 0.08);
-                osc2.stop(now + 0.6);
+                const osc1 = audioCtx.createOscillator(); const gain1 = audioCtx.createGain();
+                osc1.type = 'sine'; osc1.frequency.setValueAtTime(1318.51, now);
+                gain1.gain.setValueAtTime(0.15, now); gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                osc1.connect(gain1); gain1.connect(audioCtx.destination); osc1.start(now); osc1.stop(now + 0.3);
+                const osc2 = audioCtx.createOscillator(); const gain2 = audioCtx.createGain();
+                osc2.type = 'triangle'; osc2.frequency.setValueAtTime(2637.02, now + 0.08);
+                gain2.gain.setValueAtTime(0.2, now + 0.08); gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+                osc2.connect(gain2); gain2.connect(audioCtx.destination); osc2.start(now + 0.08); osc2.stop(now + 0.6);
             } catch (e) {}
         }
 
         function saveToLocalStorage() {
-            localStorage.setItem('ve_rates', JSON.stringify(rates));
-            localStorage.setItem('ve_activeRateKey', activeRateKey);
-            localStorage.setItem('ve_storeInfo', JSON.stringify(storeInfo));
-            localStorage.setItem('ve_clients', JSON.stringify(clients));
-            localStorage.setItem('ve_products', JSON.stringify(products));
-            localStorage.setItem('ve_salesHistory', JSON.stringify(salesHistory));
+            localStorage.setItem('ve_rates', JSON.stringify(rates)); localStorage.setItem('ve_activeRateKey', activeRateKey);
+            localStorage.setItem('ve_storeInfo', JSON.stringify(storeInfo)); localStorage.setItem('ve_clients', JSON.stringify(clients));
+            localStorage.setItem('ve_products', JSON.stringify(products)); localStorage.setItem('ve_salesHistory', JSON.stringify(salesHistory));
             localStorage.setItem('ve_debts', JSON.stringify(debts)); // Guardar Fiados
         }
 
@@ -1299,90 +1220,48 @@
             const sh = localStorage.getItem('ve_salesHistory'); if (sh) salesHistory = JSON.parse(sh);
             const db = localStorage.getItem('ve_debts'); if (db) debts = JSON.parse(db); // Cargar Fiados
 
-            document.getElementById('setStoreName').value = storeInfo.name;
-            document.getElementById('setStoreRif').value = storeInfo.rif;
-            document.getElementById('setStoreAddress').value = storeInfo.address;
-            document.getElementById('setStorePhone').value = storeInfo.phone;
-            document.getElementById('headerStoreName').innerText = storeInfo.name;
-            document.getElementById('setBcvRate').value = rates.bcv;
-            document.getElementById('setEurRate').value = rates.eur;
-            document.getElementById('setUsdtRate').value = rates.usdt;
-            document.getElementById('setPromRate').value = rates.promedio;
-            document.getElementById('themeModeSelect').value = storeInfo.theme || 'dark';
+            document.getElementById('setStoreName').value = storeInfo.name; document.getElementById('setStoreRif').value = storeInfo.rif;
+            document.getElementById('setStoreAddress').value = storeInfo.address; document.getElementById('setStorePhone').value = storeInfo.phone;
+            document.getElementById('headerStoreName').innerText = storeInfo.name; document.getElementById('setBcvRate').value = rates.bcv;
+            document.getElementById('setEurRate').value = rates.eur; document.getElementById('setUsdtRate').value = rates.usdt;
+            document.getElementById('setPromRate').value = rates.promedio; document.getElementById('themeModeSelect').value = storeInfo.theme || 'dark';
         }
 
-        function applyTheme(mode) {
-            storeInfo.theme = mode;
-            const htmlRoot = document.getElementById('htmlRoot');
-            htmlRoot.setAttribute('data-theme', mode);
-            saveToLocalStorage();
-        }
-
+        function applyTheme(mode) { storeInfo.theme = mode; document.getElementById('htmlRoot').setAttribute('data-theme', mode); saveToLocalStorage(); }
         function changeThemeMode(val) { applyTheme(val); }
 
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            if (sidebar.classList.contains('-translate-x-full')) {
-                sidebar.classList.remove('-translate-x-full'); overlay.classList.remove('hidden');
-            } else {
-                sidebar.classList.add('-translate-x-full'); overlay.classList.add('hidden');
-            }
+            const sidebar = document.getElementById('sidebar'); const overlay = document.getElementById('sidebarOverlay');
+            if (sidebar.classList.contains('-translate-x-full')) { sidebar.classList.remove('-translate-x-full'); overlay.classList.remove('hidden'); }
+            else { sidebar.classList.add('-translate-x-full'); overlay.classList.add('hidden'); }
         }
 
         function switchTab(tabId) {
             ['pos', 'inventory', 'clients', 'history', 'stats', 'calculator', 'settings', 'debts'].forEach(t => {
                 const el = document.getElementById(`tab-${t}`); if (el) el.classList.add('hidden');
                 const nav = document.getElementById(`nav-${t}`);
-                if (nav) { 
-                    nav.classList.remove('bg-emerald-600/10', 'text-emerald-600', 'dark:text-emerald-400', 'border', 'border-emerald-500/20', 'bg-amber-600/10', 'text-amber-500', 'border-amber-500/20'); 
-                }
+                if (nav) { nav.classList.remove('bg-emerald-600/10', 'text-emerald-600', 'dark:text-emerald-400', 'border', 'border-emerald-500/20'); }
             });
             const target = document.getElementById(`tab-${tabId}`); if (target) target.classList.remove('hidden');
             const activeNav = document.getElementById(`nav-${tabId}`);
-            if (activeNav) {
-                if (tabId === 'debts') {
-                    activeNav.classList.add('bg-amber-600/10', 'text-amber-500', 'border', 'border-amber-500/20');
-                } else {
-                    activeNav.classList.add('bg-emerald-600/10', 'text-emerald-600', 'dark:text-emerald-400', 'border', 'border-emerald-500/20');
-                }
-            }
-            if (tabId === 'history') renderHistoryTable();
-            if (tabId === 'stats') renderStats();
-            if (tabId === 'inventory') renderInventoryTable();
-            if (tabId === 'clients') renderClientsTable();
+            if (activeNav) { activeNav.classList.add('bg-emerald-600/10', 'text-emerald-600', 'dark:text-emerald-400', 'border', 'border-emerald-500/20'); }
+            
+            if (tabId === 'history') renderHistoryTable(); if (tabId === 'stats') renderStats();
+            if (tabId === 'inventory') renderInventoryTable(); if (tabId === 'clients') renderClientsTable();
             if (tabId === 'debts') renderDebtsTable();
         }
 
-        function toggleRateDropdown(e) {
-            if (e) e.stopPropagation();
-            const dropdown = document.getElementById('rateDropdown');
-            dropdown.classList.toggle('hidden'); 
-        }
+        function toggleRateDropdown(e) { if (e) e.stopPropagation(); document.getElementById('rateDropdown').classList.toggle('hidden'); }
 
         window.addEventListener('click', function(e) {
-            const dropdown = document.getElementById('rateDropdown');
-            const btn = document.getElementById('rateDropdownBtn');
-            if (dropdown && btn && !dropdown.contains(e.target) && !btn.contains(e.target)) {
-                dropdown.classList.add('hidden');
-            }
+            const dropdown = document.getElementById('rateDropdown'); const btn = document.getElementById('rateDropdownBtn');
+            if (dropdown && btn && !dropdown.contains(e.target) && !btn.contains(e.target)) { dropdown.classList.add('hidden'); }
         });
 
         function setActiveRateType(key) {
-            activeRateKey = key; 
-            saveToLocalStorage(); 
-            updateRateDisplay(); 
-            document.getElementById('rateDropdown').classList.add('hidden');
-            
-            renderPosProducts(); 
-            renderCart(); 
-            renderInventoryTable();
-            renderDebtsTable(); // Actualiza Bs en la tabla de fiados
-            convertCurrency('usd');
-
-            if (!document.getElementById('checkoutModal').classList.contains('hidden')) {
-                openCheckoutModal();
-            }
+            activeRateKey = key; saveToLocalStorage(); updateRateDisplay(); document.getElementById('rateDropdown').classList.add('hidden');
+            renderPosProducts(); renderCart(); renderInventoryTable(); renderDebtsTable(); convertCurrency('usd');
+            if (!document.getElementById('checkoutModal').classList.contains('hidden')) { openCheckoutModal(); }
             showAlert('Tasa Actualizada', `Toda la plataforma se actualizó a la tasa: ${key.toUpperCase()}.`, 'success');
         }
 
@@ -1392,52 +1271,26 @@
             document.getElementById('headerRateLabel').innerText = labels[activeRateKey];
             document.getElementById('headerActiveRateVal').innerText = val.toFixed(2);
             document.getElementById('statsBcv').innerText = val.toFixed(2);
-            document.getElementById('dropdownValBcv').innerText = rates.bcv.toFixed(2);
-            document.getElementById('dropdownValEur').innerText = rates.eur.toFixed(2);
-            document.getElementById('dropdownValUsdt').innerText = rates.usdt.toFixed(2);
-            document.getElementById('dropdownValProm').innerText = rates.promedio.toFixed(2);
+            document.getElementById('dropdownValBcv').innerText = rates.bcv.toFixed(2); document.getElementById('dropdownValEur').innerText = rates.eur.toFixed(2);
+            document.getElementById('dropdownValUsdt').innerText = rates.usdt.toFixed(2); document.getElementById('dropdownValProm').innerText = rates.promedio.toFixed(2);
         }
 
         async function fetchOnlineRates() {
             try {
-                const [resDol, resEur] = await Promise.all([
-                    fetch('https://ve.dolarapi.com/v1/dolares'),
-                    fetch('https://ve.dolarapi.com/v1/euros')
-                ]);
-                
-                const dataDol = await resDol.json();
-                const dataEur = await resEur.json();
-
+                const [resDol, resEur] = await Promise.all([ fetch('https://ve.dolarapi.com/v1/dolares'), fetch('https://ve.dolarapi.com/v1/euros') ]);
+                const dataDol = await resDol.json(); const dataEur = await resEur.json();
                 if (dataDol && Array.isArray(dataDol)) {
                     const bcv = dataDol.find(d => d.fuente === 'oficial' || d.fuente === 'bcv');
                     const paralelo = dataDol.find(d => d.fuente === 'paralelo' || d.fuente === 'promedio' || d.fuente === 'enparalelovzla');
-
                     if (bcv && bcv.promedio) rates.bcv = parseFloat(bcv.promedio);
-                    if (paralelo && paralelo.promedio) {
-                        rates.usdt = parseFloat(paralelo.promedio);
-                        rates.promedio = parseFloat(paralelo.promedio);
-                    }
+                    if (paralelo && paralelo.promedio) { rates.usdt = parseFloat(paralelo.promedio); rates.promedio = parseFloat(paralelo.promedio); }
                 }
-
                 if (dataEur) {
-                    if (dataEur.promedio && dataEur.promedio > 10) {
-                        rates.eur = parseFloat(dataEur.promedio);
-                    } else if (Array.isArray(dataEur)) {
-                        const eurBcv = dataEur.find(e => e.fuente === 'oficial' || e.fuente === 'bcv');
-                        if (eurBcv && eurBcv.promedio) rates.eur = parseFloat(eurBcv.promedio);
-                    }
+                    if (dataEur.promedio && dataEur.promedio > 10) { rates.eur = parseFloat(dataEur.promedio); }
+                    else if (Array.isArray(dataEur)) { const eurBcv = dataEur.find(e => e.fuente === 'oficial' || e.fuente === 'bcv'); if (eurBcv && eurBcv.promedio) rates.eur = parseFloat(eurBcv.promedio); }
                 }
-
-                saveToLocalStorage();
-                updateRateDisplay();
-                renderPosProducts();
-                renderCart();
-                renderInventoryTable();
-                renderDebtsTable();
-                updateBillingAmount(); 
-            } catch (e) {
-                console.error("No se pudieron conectar las tasas online.");
-            }
+                saveToLocalStorage(); updateRateDisplay(); renderPosProducts(); renderCart(); renderInventoryTable(); renderDebtsTable(); updateBillingAmount(); 
+            } catch (e) { console.error("No se pudieron conectar las tasas online."); }
         }
 
         function saveRatesManual() {
@@ -1445,16 +1298,13 @@
             rates.eur = parseFloat(document.getElementById('setEurRate').value) || rates.eur;
             rates.usdt = parseFloat(document.getElementById('setUsdtRate').value) || rates.usdt;
             rates.promedio = parseFloat(document.getElementById('setPromRate').value) || rates.promedio;
-            saveToLocalStorage(); updateRateDisplay(); renderPosProducts(); renderInventoryTable(); renderDebtsTable();
-            updateBillingAmount(); 
+            saveToLocalStorage(); updateRateDisplay(); renderPosProducts(); renderInventoryTable(); renderDebtsTable(); updateBillingAmount(); 
             showAlert('Éxito', 'Tasas guardadas manualmente.', 'success');
         }
 
         function saveStoreSettings() {
-            storeInfo.name = document.getElementById('setStoreName').value;
-            storeInfo.rif = document.getElementById('setStoreRif').value;
-            storeInfo.address = document.getElementById('setStoreAddress').value;
-            storeInfo.phone = document.getElementById('setStorePhone').value;
+            storeInfo.name = document.getElementById('setStoreName').value; storeInfo.rif = document.getElementById('setStoreRif').value;
+            storeInfo.address = document.getElementById('setStoreAddress').value; storeInfo.phone = document.getElementById('setStorePhone').value;
             document.getElementById('headerStoreName').innerText = storeInfo.name;
             saveToLocalStorage(); showAlert('Guardado', 'Datos fiscales actualizados.', 'success');
         }
@@ -1469,21 +1319,14 @@
             const grid = document.getElementById('posProductGrid');
             const query = document.getElementById('posSearch').value.toLowerCase();
             grid.innerHTML = '';
-            
-            if (posViewMode === 'grid') {
-                grid.className = 'grid grid-cols-2 sm:grid-cols-3 gap-3 overflow-y-auto max-h-[60vh] pr-1 pb-4';
-            } else {
-                grid.className = 'flex flex-col gap-2 overflow-y-auto max-h-[60vh] pr-1 pb-4';
-            }
+            if (posViewMode === 'grid') { grid.className = 'grid grid-cols-2 sm:grid-cols-3 gap-3 overflow-y-auto max-h-[60vh] pr-1 pb-4'; }
+            else { grid.className = 'flex flex-col gap-2 overflow-y-auto max-h-[60vh] pr-1 pb-4'; }
 
             const currentRate = rates[activeRateKey];
             const filtered = products.filter(p => p.name.toLowerCase().includes(query) || p.barcode.includes(query));
             document.getElementById('productCountBadge').innerText = `${filtered.length} productos`;
 
-            if (filtered.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400 text-sm">No hay productos</div>`;
-                return;
-            }
+            if (filtered.length === 0) { grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-400 text-sm">No hay productos</div>`; return; }
 
             filtered.forEach(p => {
                 const priceBs = (p.priceUsd * currentRate).toFixed(2);
@@ -1493,7 +1336,6 @@
                 const stockBadgeClass = p.stock > 5 ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400';
 
                 const card = document.createElement('div');
-                
                 if (posViewMode === 'grid') {
                     card.className = `app-card border rounded-2xl p-3.5 flex flex-col justify-between shadow-sm hover:border-emerald-500/50 transition cursor-pointer ${isOutOfStock ? 'opacity-50' : ''}`;
                     card.onclick = () => handleProductClick(p.id);
@@ -1534,21 +1376,13 @@
 
         function filterPosProducts() { renderPosProducts(); }
 
-        function showPosClientDropdown() {
-            document.getElementById('posClientDropdown').classList.remove('hidden');
-            filterPosClientDropdown();
-        }
-
-        document.getElementById('posClientSearchInput').addEventListener('blur', function() {
-            setTimeout(() => { document.getElementById('posClientDropdown').classList.add('hidden'); }, 200);
-        });
+        function showPosClientDropdown() { document.getElementById('posClientDropdown').classList.remove('hidden'); filterPosClientDropdown(); }
+        document.getElementById('posClientSearchInput').addEventListener('blur', function() { setTimeout(() => { document.getElementById('posClientDropdown').classList.add('hidden'); }, 200); });
 
         function filterPosClientDropdown() {
             const query = document.getElementById('posClientSearchInput').value.toLowerCase();
-            const drop = document.getElementById('posClientDropdown');
-            drop.innerHTML = '';
+            const drop = document.getElementById('posClientDropdown'); drop.innerHTML = '';
             const filtered = clients.filter(c => c.name.toLowerCase().includes(query) || c.doc.toLowerCase().includes(query));
-            
             filtered.forEach(c => {
                 const btn = document.createElement('button');
                 btn.className = "w-full text-left px-3 py-2 text-xs app-hover-item transition border-b border-slate-100 dark:border-slate-800 last:border-0";
@@ -1556,67 +1390,43 @@
                 btn.onmousedown = () => selectPosClient(c.id, c.name);
                 drop.appendChild(btn);
             });
-            if(filtered.length === 0) {
-                drop.innerHTML = `<div class="px-3 py-2 text-xs text-slate-400">No se encontraron clientes</div>`;
-            }
+            if(filtered.length === 0) { drop.innerHTML = `<div class="px-3 py-2 text-xs text-slate-400">No se encontraron clientes</div>`; }
         }
 
-        function selectPosClient(id, name) {
-            currentSelectedClientId = parseInt(id);
-            document.getElementById('posClientSearchInput').value = name;
-            document.getElementById('posClientDropdown').classList.add('hidden');
-        }
+        function selectPosClient(id, name) { currentSelectedClientId = parseInt(id); document.getElementById('posClientSearchInput').value = name; document.getElementById('posClientDropdown').classList.add('hidden'); }
 
         function handleProductClick(productId) {
-            const p = products.find(prod => prod.id === productId);
-            if (!p) return;
+            const p = products.find(prod => prod.id === productId); if (!p) return;
             if (p.type === 'weight') {
-                currentWeightProduct = p;
-                document.getElementById('weightModalTitle').innerText = `Pesable: ${p.name}`;
-                document.getElementById('weightInputValue').value = "1.000";
-                document.getElementById('weightInputType').value = "kg";
-                toggleWeightInputFields();
-                document.getElementById('weightModal').classList.remove('hidden');
-            } else {
-                addToCart(p.id, 1);
-            }
+                currentWeightProduct = p; document.getElementById('weightModalTitle').innerText = `Pesable: ${p.name}`;
+                document.getElementById('weightInputValue').value = "1.000"; document.getElementById('weightInputType').value = "kg";
+                toggleWeightInputFields(); document.getElementById('weightModal').classList.remove('hidden');
+            } else { addToCart(p.id, 1); }
         }
 
         function toggleWeightInputFields() {
-            const type = document.getElementById('weightInputType').value;
-            const lbl = document.getElementById('weightValueLabel');
-            if (type === 'kg') lbl.innerText = "Ingrese Cantidad (Kilos):";
-            else if (type === 'usd') lbl.innerText = "Ingrese Monto en Dólares ($):";
-            else lbl.innerText = "Ingrese Monto en Bolívares (Bs):";
+            const type = document.getElementById('weightInputType').value; const lbl = document.getElementById('weightValueLabel');
+            if (type === 'kg') lbl.innerText = "Ingrese Cantidad (Kilos):"; else if (type === 'usd') lbl.innerText = "Ingrese Monto en Dólares ($):"; else lbl.innerText = "Ingrese Monto en Bolívares (Bs):";
         }
-
         function closeWeightModal() { document.getElementById('weightModal').classList.add('hidden'); currentWeightProduct = null; }
 
         function confirmWeightProduct() {
             if (!currentWeightProduct) return;
-            const val = parseFloat(document.getElementById('weightInputValue').value);
-            const type = document.getElementById('weightInputType').value;
+            const val = parseFloat(document.getElementById('weightInputValue').value); const type = document.getElementById('weightInputType').value;
             const currentRate = rates[activeRateKey];
             if (isNaN(val) || val <= 0) { showAlert('Error', 'Valor inválido.', 'error'); return; }
 
             let finalKg = 0;
-            if (type === 'kg') finalKg = val;
-            else if (type === 'usd') finalKg = val / currentWeightProduct.priceUsd;
-            else if (type === 'bs') finalKg = (val / currentRate) / currentWeightProduct.priceUsd;
-
-            addToCart(currentWeightProduct.id, finalKg);
-            closeWeightModal();
+            if (type === 'kg') finalKg = val; else if (type === 'usd') finalKg = val / currentWeightProduct.priceUsd; else if (type === 'bs') finalKg = (val / currentRate) / currentWeightProduct.priceUsd;
+            addToCart(currentWeightProduct.id, finalKg); closeWeightModal();
         }
 
         function addToCart(productId, qtyToAdd) {
-            const product = products.find(p => p.id === productId);
-            if (!product) return;
+            const product = products.find(p => p.id === productId); if (!product) return;
             if (product.stock < qtyToAdd) { showAlert('Stock', 'Existencia insuficiente.', 'error'); return; }
             const existing = cart.find(item => item.id === productId);
-            if (existing) existing.quantity += qtyToAdd;
-            else cart.push({ id: product.id, name: product.name, priceUsd: product.priceUsd, quantity: qtyToAdd, stock: product.stock, type: product.type });
-            playChingSound();
-            renderCart();
+            if (existing) existing.quantity += qtyToAdd; else cart.push({ id: product.id, name: product.name, priceUsd: product.priceUsd, quantity: qtyToAdd, stock: product.stock, type: product.type });
+            playChingSound(); renderCart();
         }
 
         function updateCartQty(productId, delta) {
@@ -1625,8 +1435,7 @@
             const step = product.type === 'weight' ? 0.250 : 1;
             const newQty = item.quantity + (delta > 0 ? step : -step);
             if (newQty > product.stock) { showAlert('Límite', 'Stock superado.', 'error'); return; }
-            if (newQty <= 0) cart = cart.filter(i => i.id !== productId);
-            else item.quantity = newQty;
+            if (newQty <= 0) cart = cart.filter(i => i.id !== productId); else item.quantity = newQty;
             renderCart();
         }
 
@@ -1638,9 +1447,7 @@
             const currentRate = rates[activeRateKey];
             if (cart.length === 0) {
                 container.innerHTML = `<div class="text-center py-10 text-slate-400 text-sm"><i class="fa-solid fa-basket-shopping text-3xl mb-2 text-slate-300 dark:text-slate-700"></i><p>Carrito vacío</p></div>`;
-                document.getElementById('cartTotalUsd').innerText = '$0.00';
-                document.getElementById('cartTotalBs').innerText = 'Bs. 0.00';
-                return;
+                document.getElementById('cartTotalUsd').innerText = '$0.00'; document.getElementById('cartTotalBs').innerText = 'Bs. 0.00'; return;
             }
             let totalUsd = 0;
             cart.forEach(item => {
@@ -1658,26 +1465,20 @@
                 container.appendChild(div);
             });
             const totalBs = totalUsd * currentRate;
-            document.getElementById('cartTotalUsd').innerText = `$${totalUsd.toFixed(2)}`;
-            document.getElementById('cartTotalBs').innerText = `Bs. ${totalBs.toFixed(2)}`;
+            document.getElementById('cartTotalUsd').innerText = `$${totalUsd.toFixed(2)}`; document.getElementById('cartTotalBs').innerText = `Bs. ${totalBs.toFixed(2)}`;
         }
 
         function openCheckoutModal() {
             if (cart.length === 0) { showAlert('Vacío', 'Agregue productos.', 'error'); return; }
             const currentRate = rates[activeRateKey];
-            let totalUsd = cart.reduce((acc, i) => acc + (i.priceUsd * i.quantity), 0);
-            let totalBs = totalUsd * currentRate;
-            document.getElementById('modalCheckoutUsd').innerText = `$${totalUsd.toFixed(2)}`;
-            document.getElementById('modalCheckoutBs').innerText = `Bs. ${totalBs.toFixed(2)}`;
+            let totalUsd = cart.reduce((acc, i) => acc + (i.priceUsd * i.quantity), 0); let totalBs = totalUsd * currentRate;
+            document.getElementById('modalCheckoutUsd').innerText = `$${totalUsd.toFixed(2)}`; document.getElementById('modalCheckoutBs').innerText = `Bs. ${totalBs.toFixed(2)}`;
             document.getElementById('checkoutActiveRateName').innerText = activeRateKey.toUpperCase();
             document.getElementById('receivedUsd').value = ''; document.getElementById('receivedBs').value = '';
             document.getElementById('changeUsd').innerText = '$0.00'; document.getElementById('changeBs').innerText = 'Bs. 0.00';
             
-            const checkoutSel = document.getElementById('checkoutClientSelect');
-            checkoutSel.value = currentSelectedClientId;
-
-            setPaymentMethod('Divisas ($)');
-            document.getElementById('checkoutModal').classList.remove('hidden');
+            const checkoutSel = document.getElementById('checkoutClientSelect'); checkoutSel.value = currentSelectedClientId;
+            setPaymentMethod('Divisas ($)'); document.getElementById('checkoutModal').classList.remove('hidden');
         }
         function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); }
 
@@ -1703,8 +1504,7 @@
             let tot = cart.reduce((acc, i) => acc + (i.priceUsd * i.quantity), 0);
             let rec = parseFloat(document.getElementById('receivedUsd').value) || 0;
             let ch = Math.max(0, rec - tot);
-            document.getElementById('changeUsd').innerText = `$${ch.toFixed(2)}`;
-            document.getElementById('changeBs').innerText = `Bs. ${(ch * currentRate).toFixed(2)}`;
+            document.getElementById('changeUsd').innerText = `$${ch.toFixed(2)}`; document.getElementById('changeBs').innerText = `Bs. ${(ch * currentRate).toFixed(2)}`;
         }
 
         function calculateChangeBs() {
@@ -1712,14 +1512,12 @@
             let totBs = cart.reduce((acc, i) => acc + (i.priceUsd * i.quantity), 0) * currentRate;
             let recBs = parseFloat(document.getElementById('receivedBs').value) || 0;
             let chBs = Math.max(0, recBs - totBs);
-            document.getElementById('changeUsd').innerText = `$${(chBs / currentRate).toFixed(2)}`;
-            document.getElementById('changeBs').innerText = `Bs. ${chBs.toFixed(2)}`;
+            document.getElementById('changeUsd').innerText = `$${(chBs / currentRate).toFixed(2)}`; document.getElementById('changeBs').innerText = `Bs. ${chBs.toFixed(2)}`;
         }
 
         function completeSale() {
             const currentRate = rates[activeRateKey];
-            let totalUsd = cart.reduce((acc, i) => acc + (i.priceUsd * i.quantity), 0);
-            let totalBs = totalUsd * currentRate;
+            let totalUsd = cart.reduce((acc, i) => acc + (i.priceUsd * i.quantity), 0); let totalBs = totalUsd * currentRate;
             
             const finalClientSelectId = document.getElementById('checkoutClientSelect').value || currentSelectedClientId;
             const clientObj = clients.find(c => c.id == finalClientSelectId) || clients[0];
@@ -1728,19 +1526,13 @@
 
             const newSale = {
                 id: 'V-' + Math.floor(1000 + Math.random() * 9000),
-                date: new Date().toLocaleString(),
-                client: clientObj.name,
-                method: selectedPaymentMethod,
-                totalUsd: totalUsd,
-                totalBs: totalBs,
-                rateType: activeRateKey.toUpperCase(),
-                items: [...cart]
+                date: new Date().toLocaleString(), client: clientObj.name, method: selectedPaymentMethod,
+                totalUsd: totalUsd, totalBs: totalBs, rateType: activeRateKey.toUpperCase(), items: [...cart]
             };
 
-            salesHistory.unshift(newSale); 
-            lastCompletedSale = newSale; 
+            salesHistory.unshift(newSale); lastCompletedSale = newSale; 
 
-            // Si es Fiado / Crédito, lo agregamos a las deudas
+            // Si es Fiado / Crédito, lo agregamos a las deudas GUARDANDO LOS PRODUCTOS
             if (selectedPaymentMethod === 'Fiado / Crédito') {
                 const newDebt = {
                     id: 'F-' + Date.now(),
@@ -1748,126 +1540,203 @@
                     clientId: clientObj.id,
                     clientName: clientObj.name,
                     amountUsd: totalUsd,
-                    description: `Factura ${newSale.id}`
+                    description: `Factura ${newSale.id}`,
+                    items: JSON.parse(JSON.stringify(cart)), // Copia profunda de los items
+                    invoiceId: newSale.id
                 };
-                debts.unshift(newDebt);
-                renderDebtsTable();
+                debts.unshift(newDebt); renderDebtsTable();
             }
 
             saveToLocalStorage();
             cart = []; renderCart(); renderPosProducts(); renderInventoryTable(); renderHistoryTable(); renderStats();
-            closeCheckoutModal(); 
-            showInvoiceModal(newSale);
+            closeCheckoutModal(); showInvoiceModal(newSale);
             
             if (selectedPaymentMethod === 'Fiado / Crédito') {
-                setTimeout(() => {
-                    showAlert('Fiado Registrado', 'La cuenta por cobrar ha sido guardada en la sección de Fiados.', 'success');
-                }, 500);
+                setTimeout(() => { showAlert('Fiado Registrado', 'La cuenta por cobrar ha sido guardada en la sección de Fiados.', 'success'); }, 500);
             }
         }
 
         // =====================================
-        // FUNCIONES DE FIADO Y CRÉDITO
+        // FUNCIONES DE FIADO, CRÉDITO Y ABONOS
         // =====================================
         function renderDebtsTable() {
-            const tbody = document.getElementById('debtsTableBody'); 
-            tbody.innerHTML = '';
+            const tbody = document.getElementById('debtsTableBody'); tbody.innerHTML = '';
             const currentRate = rates[activeRateKey];
 
             if (debts.length === 0) { 
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">No hay cuentas pendientes por cobrar</td></tr>`; 
-                return; 
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400">No hay cuentas pendientes por cobrar</td></tr>`; return; 
             }
 
             debts.forEach(d => {
-                const amountBs = d.amountUsd * currentRate;
                 const tr = document.createElement('tr');
                 tr.className = 'app-table-row hover:opacity-90 transition border-b';
+                
+                // Mostrar botón de detalles solo si la deuda tiene items (viene del carrito)
+                const btnDetalles = (d.items && d.items.length > 0) 
+                    ? `<button onclick="openDebtDetailsModal('${d.id}')" class="text-sky-500 hover:text-sky-400 p-2 rounded-lg transition" title="Ver Detalles"><i class="fa-solid fa-file-invoice"></i></button>`
+                    : `<span class="inline-block p-2 text-slate-300 dark:text-slate-700" title="Sin detalles"><i class="fa-solid fa-file-invoice"></i></span>`;
+
                 tr.innerHTML = `
                     <td class="p-4 text-xs text-slate-400">${d.date}</td>
                     <td class="p-4 font-bold">${d.clientName}</td>
                     <td class="p-4 text-slate-400 text-xs">${d.description}</td>
-                    <td class="p-4 font-bold text-amber-500">$${d.amountUsd.toFixed(2)}</td>
-                    <td class="p-4">Bs. ${amountBs.toFixed(2)}</td>
-                    <td class="p-4 text-right">
-                        <button onclick="payDebt('${d.id}')" class="bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600/20 px-3 py-1.5 rounded-lg transition text-xs font-bold border border-emerald-500/30">
-                            Marcar Pagado
+                    <td class="p-4 font-bold text-rose-500">
+                        $${d.amountUsd.toFixed(2)}
+                        <div class="text-[10px] text-slate-400 font-normal">Bs. ${(d.amountUsd * currentRate).toFixed(2)}</div>
+                    </td>
+                    <td class="p-4 text-right flex items-center justify-end space-x-2">
+                        ${btnDetalles}
+                        <button onclick="openAbonoModal('${d.id}')" class="bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-600/20 px-3 py-1.5 rounded-lg transition text-xs font-bold border border-emerald-500/30 flex items-center space-x-1" title="Abonar Pago Parcial">
+                            <i class="fa-solid fa-hand-holding-dollar"></i> <span>Abonar</span>
+                        </button>
+                        <button onclick="payDebtFull('${d.id}')" class="text-emerald-500 hover:text-emerald-400 p-2 rounded-lg transition" title="Liquidar Completo">
+                            <i class="fa-solid fa-circle-check text-lg"></i>
                         </button>
                     </td>`;
                 tbody.appendChild(tr);
             });
         }
 
-        function payDebt(debtId) {
-            showConfirmModal("Confirmar Pago", "¿El cliente ya pagó esta deuda? Se eliminará de la lista.", () => {
+        function payDebtFull(debtId) {
+            showConfirmModal("Liquidar Deuda", "¿El cliente pagó el total de esta deuda? Se marcará como procesada y desaparecerá de la lista.", () => {
                 debts = debts.filter(d => d.id !== debtId);
-                saveToLocalStorage();
-                renderDebtsTable();
-                showAlert("Pagado", "La deuda ha sido liquidada y eliminada del sistema.", "success");
+                saveToLocalStorage(); renderDebtsTable();
+                showAlert("Deuda Pagada", "La deuda ha sido liquidada completamente.", "success");
             });
         }
 
-        function openManualDebtModal() {
-            document.getElementById('debtAmountUsd').value = '';
-            document.getElementById('debtDesc').value = '';
-            
-            const sel = document.getElementById('debtClientSelect');
-            sel.innerHTML = '';
-            clients.forEach(c => {
-                if (c.id === 1) return; // Evitar cliente de contado general para fiados si se prefiere (opcional)
-                const opt = document.createElement('option'); 
-                opt.value = c.id; 
-                opt.innerText = `${c.name} (${c.doc})`; 
-                sel.appendChild(opt); 
-            });
+        // --- Abonos ---
+        function openAbonoModal(debtId) {
+            currentAbonoDebtId = debtId;
+            const debt = debts.find(d => d.id === debtId);
+            if(!debt) return;
 
-            if (sel.options.length === 0) {
-                showAlert("Sin Clientes", "Debe registrar al menos un cliente en el sistema para poder fiarle.", "error");
+            document.getElementById('abonoClientName').innerText = debt.clientName;
+            document.getElementById('abonoDebtAmount').innerText = `$${debt.amountUsd.toFixed(2)}`;
+            document.getElementById('abonoUsd').value = '';
+            document.getElementById('abonoBs').value = '';
+            document.getElementById('abonoModal').classList.remove('hidden');
+        }
+
+        function closeAbonoModal() {
+            document.getElementById('abonoModal').classList.add('hidden');
+            currentAbonoDebtId = null;
+        }
+
+        function calcAbonoValue(changedType) {
+            const currentRate = rates[activeRateKey];
+            const inpUsd = document.getElementById('abonoUsd');
+            const inpBs = document.getElementById('abonoBs');
+            
+            if (changedType === 'usd') {
+                let v = parseFloat(inpUsd.value) || 0;
+                inpBs.value = (v * currentRate).toFixed(2);
+            } else if (changedType === 'bs') {
+                let v = parseFloat(inpBs.value) || 0;
+                inpUsd.value = (v / currentRate).toFixed(2);
+            }
+        }
+
+        function confirmAbono() {
+            if(!currentAbonoDebtId) return;
+            const abonoUsd = parseFloat(document.getElementById('abonoUsd').value);
+            
+            if(isNaN(abonoUsd) || abonoUsd <= 0) {
+                showAlert('Error de Abono', 'Ingrese un monto de abono mayor a cero.', 'error');
                 return;
             }
+
+            const debtIndex = debts.findIndex(d => d.id === currentAbonoDebtId);
+            if(debtIndex === -1) return;
+
+            let debt = debts[debtIndex];
+            
+            if (abonoUsd >= debt.amountUsd) {
+                // Pagó todo o más
+                debts.splice(debtIndex, 1);
+                showAlert('Deuda Liquidada', 'El monto abonado cubre el total de la deuda. Ha sido liquidada.', 'success');
+            } else {
+                // Pago parcial
+                debt.amountUsd -= abonoUsd;
+                showAlert('Abono Procesado', `Se ha abonado $${abonoUsd.toFixed(2)} a la deuda. Restan $${debt.amountUsd.toFixed(2)}.`, 'success');
+            }
+            
+            saveToLocalStorage();
+            renderDebtsTable();
+            closeAbonoModal();
+        }
+
+        // --- Detalles de Deuda ---
+        function openDebtDetailsModal(debtId) {
+            const debt = debts.find(d => d.id === debtId);
+            if(!debt) return;
+
+            document.getElementById('detDebtClient').innerText = `Cliente: ${debt.clientName}`;
+            document.getElementById('detDebtDate').innerText = `Fecha: ${debt.date} | Ref: ${debt.description}`;
+            document.getElementById('detDebtTotalUsd').innerText = `$${debt.amountUsd.toFixed(2)}`;
+
+            const tbody = document.getElementById('detDebtItemsList');
+            const manualDesc = document.getElementById('detDebtManualDesc');
+            const tableContainer = document.getElementById('detDebtItemsContainer');
+            
+            tbody.innerHTML = '';
+            
+            if (debt.items && debt.items.length > 0) {
+                manualDesc.classList.add('hidden');
+                tableContainer.classList.remove('hidden');
+                
+                debt.items.forEach(i => {
+                    let t = i.priceUsd * i.quantity;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td class="py-1">${i.type === 'weight' ? i.quantity.toFixed(3) + 'kg' : i.quantity}</td><td class="py-1">${i.name}</td><td class="py-1 text-right">$${t.toFixed(2)}</td>`;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                manualDesc.classList.remove('hidden');
+                tableContainer.classList.add('hidden');
+            }
+
+            document.getElementById('debtDetailsModal').classList.remove('hidden');
+        }
+
+        function closeDebtDetailsModal() {
+            document.getElementById('debtDetailsModal').classList.add('hidden');
+        }
+
+        // --- Registro Manual de Deuda ---
+        function openManualDebtModal() {
+            document.getElementById('debtAmountUsd').value = ''; document.getElementById('debtDesc').value = '';
+            const sel = document.getElementById('debtClientSelect'); sel.innerHTML = '';
+            clients.forEach(c => { 
+                if (c.id === 1) return; // Se omite "Cliente General" para fiados
+                const opt = document.createElement('option'); opt.value = c.id; opt.innerText = `${c.name} (${c.doc})`; sel.appendChild(opt); 
+            });
+            if (sel.options.length === 0) { showAlert("Sin Clientes", "Debe registrar al menos un cliente en el sistema para poder fiarle.", "error"); return; }
             document.getElementById('manualDebtModal').classList.remove('hidden');
         }
-
-        function closeManualDebtModal() {
-            document.getElementById('manualDebtModal').classList.add('hidden');
-        }
-
+        function closeManualDebtModal() { document.getElementById('manualDebtModal').classList.add('hidden'); }
         function saveManualDebt() {
             const clientId = document.getElementById('debtClientSelect').value;
             const amountUsd = parseFloat(document.getElementById('debtAmountUsd').value);
             const desc = document.getElementById('debtDesc').value.trim() || 'Fiado manual';
-
-            if (!clientId || isNaN(amountUsd) || amountUsd <= 0) {
-                showAlert("Error", "Ingrese un monto válido mayor a cero.", "error");
-                return;
-            }
-
+            if (!clientId || isNaN(amountUsd) || amountUsd <= 0) { showAlert("Error", "Ingrese un monto válido mayor a cero.", "error"); return; }
             const clientObj = clients.find(c => c.id == clientId);
             
             const newDebt = {
-                id: 'F-' + Date.now(),
-                date: new Date().toLocaleString().split(',')[0],
-                clientId: clientObj.id,
-                clientName: clientObj.name,
-                amountUsd: amountUsd,
-                description: desc
+                id: 'F-' + Date.now(), date: new Date().toLocaleString().split(',')[0],
+                clientId: clientObj.id, clientName: clientObj.name, amountUsd: amountUsd, description: desc,
+                items: [] // Sin ítems porque es manual
             };
             
-            debts.unshift(newDebt);
-            saveToLocalStorage();
-            renderDebtsTable();
-            closeManualDebtModal();
+            debts.unshift(newDebt); saveToLocalStorage(); renderDebtsTable(); closeManualDebtModal();
             showAlert("Fiado Registrado", "La deuda se guardó correctamente.", "success");
         }
         // =====================================
 
         function showInvoiceModal(sale) {
-            document.getElementById('invStoreName').innerText = storeInfo.name;
-            document.getElementById('invStoreRif').innerText = `RIF: ${storeInfo.rif}`;
-            document.getElementById('invStoreAddress').innerText = storeInfo.address;
-            document.getElementById('invNumber').innerText = `Factura: ${sale.id}`;
-            document.getElementById('invDate').innerText = sale.date;
-            document.getElementById('invClient').innerText = `Cliente: ${sale.client}`;
+            document.getElementById('invStoreName').innerText = storeInfo.name; document.getElementById('invStoreRif').innerText = `RIF: ${storeInfo.rif}`;
+            document.getElementById('invStoreAddress').innerText = storeInfo.address; document.getElementById('invNumber').innerText = `Factura: ${sale.id}`;
+            document.getElementById('invDate').innerText = sale.date; document.getElementById('invClient').innerText = `Cliente: ${sale.client}`;
             document.getElementById('invRateType').innerText = `Tasa: ${sale.rateType}`;
             
             const tbody = document.getElementById('invItemsList'); tbody.innerHTML = '';
@@ -1887,20 +1756,16 @@
         function shareInvoice() {
             if (!lastCompletedSale) return;
             const text = `*Factura ${lastCompletedSale.id}*\nNegocio: ${storeInfo.name}\nCliente: ${lastCompletedSale.client}\nTotal: $${lastCompletedSale.totalUsd.toFixed(2)} (Bs. ${lastCompletedSale.totalBs.toFixed(2)})\nMétodo: ${lastCompletedSale.method}`;
-            
             copyText(text, () => {
-                const btn = document.querySelector('#invoiceModal button.bg-sky-600');
-                const origHtml = btn.innerHTML;
-                btn.innerHTML = `<i class="fa-solid fa-check"></i> <span>¡Copiado!</span>`;
-                setTimeout(() => { btn.innerHTML = origHtml; }, 2000);
+                const btn = document.querySelector('#invoiceModal button.bg-sky-600'); const origHtml = btn.innerHTML;
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> <span>¡Copiado!</span>`; setTimeout(() => { btn.innerHTML = origHtml; }, 2000);
             });
         }
 
         function performCashClosing() {
             if (salesHistory.length === 0) { showAlert('Caja', 'Sin ventas para cerrar.', 'error'); return; }
             showConfirmModal('Cierre Z', '¿Está seguro de reiniciar la caja a cero? (Las deudas/fiados NO se borrarán).', () => {
-                salesHistory = []; saveToLocalStorage(); renderHistoryTable(); renderStats();
-                showAlert('Éxito', 'Cierre de caja realizado. Mostrador en cero.', 'success');
+                salesHistory = []; saveToLocalStorage(); renderHistoryTable(); renderStats(); showAlert('Éxito', 'Cierre de caja realizado. Mostrador en cero.', 'success');
             });
         }
 
@@ -1911,217 +1776,84 @@
         function closeQuickClientModal() { document.getElementById('quickClientModal').classList.add('hidden'); }
         
         function saveQuickClient() {
-            const doc = document.getElementById('qcDoc').value.trim();
-            const name = document.getElementById('qcName').value.trim();
-            const phone = document.getElementById('qcPhone').value.trim();
+            const doc = document.getElementById('qcDoc').value.trim(); const name = document.getElementById('qcName').value.trim(); const phone = document.getElementById('qcPhone').value.trim();
             if (!doc || !name) { showAlert('Error', 'Datos incompletos.', 'error'); return; }
             const newC = { id: Date.now(), doc, name, phone: phone, address: 'Venezuela' };
             clients.push(newC); saveToLocalStorage(); populateClientSelect();
-            
-            currentSelectedClientId = newC.id;
-            document.getElementById('posClientSearchInput').value = newC.name;
-            document.getElementById('checkoutClientSelect').value = newC.id;
-
-            document.getElementById('qcDoc').value = '';
-            document.getElementById('qcName').value = '';
-            document.getElementById('qcPhone').value = '';
-
+            currentSelectedClientId = newC.id; document.getElementById('posClientSearchInput').value = newC.name; document.getElementById('checkoutClientSelect').value = newC.id;
+            document.getElementById('qcDoc').value = ''; document.getElementById('qcName').value = ''; document.getElementById('qcPhone').value = '';
             closeQuickClientModal(); showAlert('Éxito', 'Cliente registrado y seleccionado.', 'success');
         }
 
         async function initScannerModal(isForInputId = null) {
-            activeInputForScanner = isForInputId;
-            document.getElementById('scannerModal').classList.remove('hidden');
-            
-            const badge = document.getElementById('scannerStatusBadge');
-            badge.innerText = 'Buscando ópticas...';
-
+            activeInputForScanner = isForInputId; document.getElementById('scannerModal').classList.remove('hidden');
+            const badge = document.getElementById('scannerStatusBadge'); badge.innerText = 'Buscando ópticas...';
             setTimeout(async () => {
-                if (!html5QrCode) {
-                    html5QrCode = new Html5Qrcode("reader");
-                }
-
+                if (!html5QrCode) { html5QrCode = new Html5Qrcode("reader"); }
                 try {
                     const devices = await Html5Qrcode.getCameras();
                     if (devices && devices.length) {
-                        availableCameras = devices;
-                        
-                        const select = document.getElementById('cameraSelect');
-                        select.innerHTML = '';
-                        devices.forEach((device, index) => {
-                            const opt = document.createElement('option');
-                            opt.value = device.id;
-                            opt.innerText = device.label || `Cámara ${index + 1}`;
-                            select.appendChild(opt);
-                        });
-
-                        let bestCamera = devices.find(d => {
-                            let l = d.label.toLowerCase();
-                            return (l.includes('back') || l.includes('trasera')) && !l.includes('ultra') && !l.includes('macro');
-                        });
+                        availableCameras = devices; const select = document.getElementById('cameraSelect'); select.innerHTML = '';
+                        devices.forEach((device, index) => { const opt = document.createElement('option'); opt.value = device.id; opt.innerText = device.label || `Cámara ${index + 1}`; select.appendChild(opt); });
+                        let bestCamera = devices.find(d => { let l = d.label.toLowerCase(); return (l.includes('back') || l.includes('trasera')) && !l.includes('ultra') && !l.includes('macro'); });
                         if (!bestCamera) bestCamera = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('trasera'));
                         if (!bestCamera) bestCamera = devices[0];
-                        
-                        currentCameraId = bestCamera.id;
-                        select.value = currentCameraId;
-
-                        startHtml5ScannerProcess(currentCameraId);
-                    } else {
-                        badge.innerText = 'No se detectó cámara';
-                        showAlert('Error', 'No se encontraron cámaras en este dispositivo.', 'error');
-                    }
-                } catch (err) {
-                    badge.innerText = 'Cámara Bloqueada';
-                    showAlert('Error de Cámara', 'Para que funcione el escáner la web DEBE estar en HTTPS (sitio seguro) y debes dar permisos de cámara.', 'error');
-                }
+                        currentCameraId = bestCamera.id; select.value = currentCameraId; startHtml5ScannerProcess(currentCameraId);
+                    } else { badge.innerText = 'No se detectó cámara'; showAlert('Error', 'No se encontraron cámaras en este dispositivo.', 'error'); }
+                } catch (err) { badge.innerText = 'Cámara Bloqueada'; showAlert('Error de Cámara', 'Para que funcione el escáner la web DEBE estar en HTTPS (sitio seguro) y debes dar permisos de cámara.', 'error'); }
             }, 300);
         }
 
-        function startBarcodeScanner() {
-            initScannerModal(null);
-        }
-
-        function startScannerForInput(id) {
-            initScannerModal(id);
-        }
-
-        function getResponsiveQrBox() {
-            const width = window.innerWidth;
-            const size = Math.min(width * 0.8, 300);
-            return {
-                width: Math.floor(size),
-                height: Math.floor(size * 0.5) 
-            };
-        }
+        function startBarcodeScanner() { initScannerModal(null); }
+        function startScannerForInput(id) { initScannerModal(id); }
+        function getResponsiveQrBox() { const width = window.innerWidth; const size = Math.min(width * 0.8, 300); return { width: Math.floor(size), height: Math.floor(size * 0.5) }; }
 
         function startHtml5ScannerProcess(cameraId) {
-            const badge = document.getElementById('scannerStatusBadge');
-            badge.innerText = 'Enfocando...';
-            
-            const config = {
-                fps: 10, 
-                qrbox: getResponsiveQrBox(), 
-                aspectRatio: 1.0,
-                disableFlip: false,
-                formatsToSupport: [ 
-                    Html5QrcodeSupportedFormats.EAN_13, 
-                    Html5QrcodeSupportedFormats.EAN_8, 
-                    Html5QrcodeSupportedFormats.UPC_A, 
-                    Html5QrcodeSupportedFormats.UPC_E, 
-                    Html5QrcodeSupportedFormats.CODE_128, 
-                    Html5QrcodeSupportedFormats.CODE_39 
-                ]
-            };
-
-            html5QrCode.start(
-                cameraId,
-                config,
-                (decodedText, decodedResult) => {
-                    processScannedCode(decodedText);
-                },
-                (errorMessage) => {}
-            ).then(() => {
-                badge.innerText = 'Escaneando zona verde';
-                torchOn = false;
-                updateTorchButtonUI();
+            const badge = document.getElementById('scannerStatusBadge'); badge.innerText = 'Enfocando...';
+            const config = { fps: 10, qrbox: getResponsiveQrBox(), aspectRatio: 1.0, disableFlip: false, formatsToSupport: [ Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8, Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E, Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39 ] };
+            html5QrCode.start(cameraId, config, (decodedText, decodedResult) => { processScannedCode(decodedText); }, (errorMessage) => {}
+            ).then(() => { badge.innerText = 'Escaneando zona verde'; torchOn = false; updateTorchButtonUI();
             }).catch((err) => {
                  console.error("Error al iniciar lector:", err);
-                 if(err && String(err).includes('OverconstrainedError')) {
-                     badge.innerText = 'Reintentando cámara...';
-                     html5QrCode.start({ facingMode: "environment" }, config, processScannedCode, undefined);
-                 } else {
-                     badge.innerText = 'Error de conexión';
-                 }
+                 if(err && String(err).includes('OverconstrainedError')) { badge.innerText = 'Reintentando cámara...'; html5QrCode.start({ facingMode: "environment" }, config, processScannedCode, undefined); }
+                 else { badge.innerText = 'Error de conexión'; }
             });
         }
 
         async function changeCameraDevice() {
-            const select = document.getElementById('cameraSelect');
-            currentCameraId = select.value;
-
-            const badge = document.getElementById('scannerStatusBadge');
-            badge.innerText = 'Cambiando óptica...';
-
-            if (html5QrCode && html5QrCode.isScanning) {
-                await html5QrCode.stop();
-                startHtml5ScannerProcess(currentCameraId);
-            } else {
-                startHtml5ScannerProcess(currentCameraId);
-            }
+            const select = document.getElementById('cameraSelect'); currentCameraId = select.value;
+            const badge = document.getElementById('scannerStatusBadge'); badge.innerText = 'Cambiando óptica...';
+            if (html5QrCode && html5QrCode.isScanning) { await html5QrCode.stop(); startHtml5ScannerProcess(currentCameraId); } else { startHtml5ScannerProcess(currentCameraId); }
         }
 
         function processScannedCode(text) {
-            const now = Date.now();
-            if (now - lastScanTime < 1500) return; 
-            lastScanTime = now;
-            
-            playChingSound();
-            
-            if (activeInputForScanner) {
-                document.getElementById(activeInputForScanner).value = text;
-                stopScanner();
-            } else {
-                handleScannedCode(text);
-            }
+            const now = Date.now(); if (now - lastScanTime < 1500) return; lastScanTime = now; playChingSound();
+            if (activeInputForScanner) { document.getElementById(activeInputForScanner).value = text; stopScanner(); } else { handleScannedCode(text); }
         }
 
         function handleScannedCode(code) {
             const badge = document.getElementById('scannerStatusBadge');
-            if (badge) {
-                badge.innerText = `¡Escaneado: ${code}!`;
-                setTimeout(() => { 
-                    if(html5QrCode && html5QrCode.isScanning) badge.innerText = "Escaneando zona verde"; 
-                }, 2000);
-            }
-            
+            if (badge) { badge.innerText = `¡Escaneado: ${code}!`; setTimeout(() => { if(html5QrCode && html5QrCode.isScanning) badge.innerText = "Escaneando zona verde"; }, 2000); }
             const p = products.find(prod => prod.barcode === code);
-            if (p) {
-                handleProductClick(p.id);
-            } else {
-                stopScanner();
-                showAlert('No registrado', `Código: ${code}`, 'error');
-                openAddQuickProductModal(); 
-                document.getElementById('prodBarcode').value = code;
-            }
+            if (p) { handleProductClick(p.id); } else { stopScanner(); showAlert('No registrado', `Código: ${code}`, 'error'); openAddQuickProductModal(); document.getElementById('prodBarcode').value = code; }
         }
 
         function stopScanner() {
-            if (html5QrCode && html5QrCode.isScanning) {
-                html5QrCode.stop().then(() => {
-                    html5QrCode.clear();
-                }).catch(e => console.error(e));
-            }
-            torchOn = false;
-            updateTorchButtonUI();
-            activeInputForScanner = null;
-            document.getElementById('scannerModal').classList.add('hidden');
+            if (html5QrCode && html5QrCode.isScanning) { html5QrCode.stop().then(() => { html5QrCode.clear(); }).catch(e => console.error(e)); }
+            torchOn = false; updateTorchButtonUI(); activeInputForScanner = null; document.getElementById('scannerModal').classList.add('hidden');
         }
 
         async function toggleTorch() {
             if (html5QrCode && html5QrCode.isScanning) {
-                try {
-                    torchOn = !torchOn;
-                    await html5QrCode.applyVideoConstraints({
-                        advanced: [{ torch: torchOn }]
-                    });
-                    updateTorchButtonUI();
-                } catch (err) {
-                    torchOn = !torchOn; 
-                    showAlert('Flash no soportado', 'Tu cámara o navegador actual no soporta el control manual del flash desde la web.', 'error');
-                }
+                try { torchOn = !torchOn; await html5QrCode.applyVideoConstraints({ advanced: [{ torch: torchOn }] }); updateTorchButtonUI(); }
+                catch (err) { torchOn = !torchOn; showAlert('Flash no soportado', 'Tu cámara o navegador actual no soporta el control manual del flash desde la web.', 'error'); }
             }
         }
 
         function updateTorchButtonUI() {
-            const btn = document.getElementById('torchBtn');
-            const lbl = document.getElementById('torchLabel');
-            if (torchOn) {
-                btn.className = "bg-amber-500 text-slate-950 px-5 py-3 rounded-xl text-sm font-bold transition border border-amber-400 flex items-center space-x-2 shadow-lg shadow-amber-500/30";
-                lbl.innerText = "Flash: ON";
-            } else {
-                btn.className = "bg-amber-600/20 text-amber-500 hover:bg-amber-600/30 px-5 py-3 rounded-xl text-sm font-bold transition border border-amber-500/30 flex items-center space-x-2";
-                lbl.innerText = "Flash: OFF";
-            }
+            const btn = document.getElementById('torchBtn'); const lbl = document.getElementById('torchLabel');
+            if (torchOn) { btn.className = "bg-amber-500 text-slate-950 px-5 py-3 rounded-xl text-sm font-bold transition border border-amber-400 flex items-center space-x-2 shadow-lg shadow-amber-500/30"; lbl.innerText = "Flash: ON"; }
+            else { btn.className = "bg-amber-600/20 text-amber-500 hover:bg-amber-600/30 px-5 py-3 rounded-xl text-sm font-bold transition border border-amber-500/30 flex items-center space-x-2"; lbl.innerText = "Flash: OFF"; }
         }
 
         function convertCurrency(type) {
@@ -2133,13 +1865,8 @@
         }
 
         function copyAmount(inputId, btn) {
-            const input = document.getElementById(inputId);
-            if (!input.value) return;
-            copyText(input.value, () => {
-                const icon = btn.querySelector('i');
-                icon.className = 'fa-solid fa-check text-emerald-500 text-lg';
-                setTimeout(() => { icon.className = 'fa-regular fa-copy text-lg'; }, 1500);
-            });
+            const input = document.getElementById(inputId); if (!input.value) return;
+            copyText(input.value, () => { const icon = btn.querySelector('i'); icon.className = 'fa-solid fa-check text-emerald-500 text-lg'; setTimeout(() => { icon.className = 'fa-regular fa-copy text-lg'; }, 1500); });
         }
 
         function calcAppend(val) { if (calcDisplay === "0" && val !== '.') calcDisplay = ""; calcDisplay += val; document.getElementById('calcScreen').value = calcDisplay; }
@@ -2157,51 +1884,30 @@
             const tbody = document.getElementById('inventoryTableBody'); const q = document.getElementById('inventorySearch').value.toLowerCase();
             tbody.innerHTML = ''; const currentRate = rates[activeRateKey];
             
-            let totalCostUsd = 0;
-            let totalSaleUsd = 0;
-            let totalStock = 0;
+            let totalCostUsd = 0; let totalSaleUsd = 0; let totalStock = 0;
 
             products.filter(p => p.name.toLowerCase().includes(q) || p.barcode.includes(q)).forEach(p => {
-                const tr = document.createElement('tr');
-                tr.className = 'app-table-row hover:opacity-90 transition border-b';
+                const tr = document.createElement('tr'); tr.className = 'app-table-row hover:opacity-90 transition border-b';
                 tr.innerHTML = `<td class="p-4 font-mono text-xs text-slate-400">${p.barcode}</td><td class="p-4 font-bold">${p.name}</td><td class="p-4">$${(p.costUsd||0).toFixed(2)}</td><td class="p-4">${p.margin||0}%</td><td class="p-4 font-bold text-emerald-600 dark:text-emerald-400">$${p.priceUsd.toFixed(2)}</td><td class="p-4">Bs. ${(p.priceUsd * currentRate).toFixed(2)}</td><td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${p.stock>5?'bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400':'bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400'}">${p.stock}</span></td><td class="p-4 text-right space-x-2"><button onclick="openEditProductModal(${p.id})" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-pen"></i></button><button onclick="deleteProduct(${p.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td>`;
                 tbody.appendChild(tr);
             });
 
-            products.forEach(p => {
-                if (p.stock > 0) {
-                    totalCostUsd += ((p.costUsd || 0) * p.stock);
-                    totalSaleUsd += ((p.priceUsd || 0) * p.stock);
-                    totalStock += p.stock;
-                }
-            });
+            products.forEach(p => { if (p.stock > 0) { totalCostUsd += ((p.costUsd || 0) * p.stock); totalSaleUsd += ((p.priceUsd || 0) * p.stock); totalStock += p.stock; } });
 
-            document.getElementById('invTotalCostUsd').innerText = `$${totalCostUsd.toFixed(2)}`;
-            document.getElementById('invTotalCostBs').innerText = `Bs. ${(totalCostUsd * currentRate).toFixed(2)}`;
-            document.getElementById('invTotalSaleUsd').innerText = `$${totalSaleUsd.toFixed(2)}`;
-            document.getElementById('invTotalSaleBs').innerText = `Bs. ${(totalSaleUsd * currentRate).toFixed(2)}`;
+            document.getElementById('invTotalCostUsd').innerText = `$${totalCostUsd.toFixed(2)}`; document.getElementById('invTotalCostBs').innerText = `Bs. ${(totalCostUsd * currentRate).toFixed(2)}`;
+            document.getElementById('invTotalSaleUsd').innerText = `$${totalSaleUsd.toFixed(2)}`; document.getElementById('invTotalSaleBs').innerText = `Bs. ${(totalSaleUsd * currentRate).toFixed(2)}`;
             document.getElementById('invTotalStock').innerText = totalStock.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
         }
         
         function calculateSellingPrice() {
-            let c = parseFloat(document.getElementById('prodCostUsd').value) || 0;
-            let mStr = document.getElementById('prodMargin').value;
-            let m = parseFloat(mStr);
-            if (isNaN(m)) m = 0;
-            document.getElementById('prodPriceUsd').value = (c * (1 + (m / 100))).toFixed(2);
+            let c = parseFloat(document.getElementById('prodCostUsd').value) || 0; let mStr = document.getElementById('prodMargin').value;
+            let m = parseFloat(mStr); if (isNaN(m)) m = 0; document.getElementById('prodPriceUsd').value = (c * (1 + (m / 100))).toFixed(2);
         }
 
         function calculateMargin() {
-            let c = parseFloat(document.getElementById('prodCostUsd').value) || 0;
-            let p = parseFloat(document.getElementById('prodPriceUsd').value) || 0;
-            if (c > 0) {
-                let m = ((p - c) / c) * 100;
-                document.getElementById('prodMargin').value = parseFloat(m.toFixed(2));
-            } else if (p > 0) {
-                document.getElementById('prodMargin').value = 100;
-            } else {
-                document.getElementById('prodMargin').value = 0;
-            }
+            let c = parseFloat(document.getElementById('prodCostUsd').value) || 0; let p = parseFloat(document.getElementById('prodPriceUsd').value) || 0;
+            if (c > 0) { let m = ((p - c) / c) * 100; document.getElementById('prodMargin').value = parseFloat(m.toFixed(2)); }
+            else if (p > 0) { document.getElementById('prodMargin').value = 100; } else { document.getElementById('prodMargin').value = 0; }
         }
         
         function openAddQuickProductModal() {
@@ -2221,19 +1927,12 @@
         }
         function closeProductModal() { document.getElementById('productModal').classList.add('hidden'); }
         function saveProduct() {
-            const id = document.getElementById('editProductId').value;
-            const barcode = document.getElementById('prodBarcode').value.trim();
-            const name = document.getElementById('prodName').value.trim();
-            const costUsd = parseFloat(document.getElementById('prodCostUsd').value) || 0;
-            const margin = parseFloat(document.getElementById('prodMargin').value) || 30;
-            const priceUsd = parseFloat(document.getElementById('prodPriceUsd').value);
-            const stock = parseFloat(document.getElementById('prodStock').value);
-            const type = document.getElementById('prodType').value;
+            const id = document.getElementById('editProductId').value; const barcode = document.getElementById('prodBarcode').value.trim(); const name = document.getElementById('prodName').value.trim();
+            const costUsd = parseFloat(document.getElementById('prodCostUsd').value) || 0; const margin = parseFloat(document.getElementById('prodMargin').value) || 30;
+            const priceUsd = parseFloat(document.getElementById('prodPriceUsd').value); const stock = parseFloat(document.getElementById('prodStock').value); const type = document.getElementById('prodType').value;
             if (!name || isNaN(priceUsd) || isNaN(stock)) { showAlert('Error', 'Complete los campos.', 'error'); return; }
-            if (id) {
-                const p = products.find(prod => prod.id == id);
-                if (p) { p.barcode = barcode; p.name = name; p.costUsd = costUsd; p.margin = margin; p.priceUsd = priceUsd; p.stock = stock; p.type = type; }
-            } else { products.push({ id: Date.now(), barcode, name, costUsd, margin, priceUsd, stock, type }); }
+            if (id) { const p = products.find(prod => prod.id == id); if (p) { p.barcode = barcode; p.name = name; p.costUsd = costUsd; p.margin = margin; p.priceUsd = priceUsd; p.stock = stock; p.type = type; } }
+            else { products.push({ id: Date.now(), barcode, name, costUsd, margin, priceUsd, stock, type }); }
             saveToLocalStorage(); closeProductModal(); renderPosProducts(); renderInventoryTable(); showAlert('Éxito', 'Guardado.', 'success');
         }
         function deleteProduct(id) { showConfirmModal('Eliminar', '¿Eliminar producto?', () => { products = products.filter(p => p.id !== id); saveToLocalStorage(); renderPosProducts(); renderInventoryTable(); }); }
@@ -2241,8 +1940,7 @@
         function renderClientsTable() {
             const tbody = document.getElementById('clientsTableBody'); tbody.innerHTML = '';
             clients.forEach(c => {
-                const tr = document.createElement('tr');
-                tr.className = 'app-table-row hover:opacity-90 transition border-b';
+                const tr = document.createElement('tr'); tr.className = 'app-table-row hover:opacity-90 transition border-b';
                 tr.innerHTML = `<td class="p-4 font-bold">${c.doc}</td><td class="p-4">${c.name}</td><td class="p-4 text-slate-400">${c.phone}</td><td class="p-4 text-slate-400">${c.address}</td><td class="p-4 text-right"><button onclick="deleteClient(${c.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td>`;
                 tbody.appendChild(tr);
             });
@@ -2252,26 +1950,13 @@
         function closeClientModal() { document.getElementById('clientModal').classList.add('hidden'); }
         
         function saveClient() {
-            const doc = document.getElementById('clientDoc').value.trim(); 
-            const name = document.getElementById('clientName').value.trim();
-            const phone = document.getElementById('clientPhone').value.trim();
-            const address = document.getElementById('clientAddress').value.trim();
-
+            const doc = document.getElementById('clientDoc').value.trim(); const name = document.getElementById('clientName').value.trim();
+            const phone = document.getElementById('clientPhone').value.trim(); const address = document.getElementById('clientAddress').value.trim();
             if (!doc || !name) { showAlert('Error', 'Incompleto.', 'error'); return; }
             const newC = { id: Date.now(), doc, name, phone: phone, address: address };
-            clients.push(newC);
-            currentSelectedClientId = newC.id;
-            
-            saveToLocalStorage(); 
-            closeClientModal(); 
-            renderClientsTable(); 
-            
-            document.getElementById('posClientSearchInput').value = newC.name;
-            document.getElementById('clientDoc').value = '';
-            document.getElementById('clientName').value = '';
-            document.getElementById('clientPhone').value = '';
-            document.getElementById('clientAddress').value = '';
-
+            clients.push(newC); currentSelectedClientId = newC.id;
+            saveToLocalStorage(); closeClientModal(); renderClientsTable(); 
+            document.getElementById('posClientSearchInput').value = newC.name; document.getElementById('clientDoc').value = ''; document.getElementById('clientName').value = ''; document.getElementById('clientPhone').value = ''; document.getElementById('clientAddress').value = '';
             showAlert('Éxito', 'Cliente guardado y seleccionado en la venta.', 'success');
         }
         function deleteClient(id) { if (id === 1) return; clients = clients.filter(c => c.id !== id); saveToLocalStorage(); renderClientsTable(); }
@@ -2280,13 +1965,7 @@
             const sel = document.getElementById('checkoutClientSelect');
             if (sel) {
                 sel.innerHTML = '';
-                clients.forEach(c => { 
-                    const opt = document.createElement('option'); 
-                    opt.value = c.id; 
-                    opt.innerText = `${c.name} (${c.doc})`; 
-                    if(c.id === currentSelectedClientId) opt.selected = true;
-                    sel.appendChild(opt); 
-                });
+                clients.forEach(c => { const opt = document.createElement('option'); opt.value = c.id; opt.innerText = `${c.name} (${c.doc})`; if(c.id === currentSelectedClientId) opt.selected = true; sel.appendChild(opt); });
             }
         }
 
@@ -2294,8 +1973,7 @@
             const tbody = document.getElementById('historyTableBody'); tbody.innerHTML = '';
             if (salesHistory.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">Sin ventas</td></tr>`; return; }
             salesHistory.forEach(s => {
-                const tr = document.createElement('tr');
-                tr.className = 'app-table-row hover:opacity-90 transition border-b';
+                const tr = document.createElement('tr'); tr.className = 'app-table-row hover:opacity-90 transition border-b';
                 tr.innerHTML = `<td class="p-4 font-bold">${s.id}</td><td class="p-4 text-xs text-slate-400">${s.date}</td><td class="p-4">${s.method}</td><td class="p-4 font-bold text-emerald-600 dark:text-emerald-400">$${s.totalUsd.toFixed(2)}</td><td class="p-4">Bs. ${s.totalBs.toFixed(2)}</td><td class="p-4 text-right"><button onclick="showInvoiceModalById('${s.id}')" class="text-emerald-600 dark:text-emerald-400 font-bold text-xs">Ver</button></td>`;
                 tbody.appendChild(tr);
             });
@@ -2303,9 +1981,7 @@
         function showInvoiceModalById(id) { const s = salesHistory.find(item => item.id === id); if (s) showInvoiceModal(s); }
         function renderStats() {
             let u = salesHistory.reduce((acc, s) => acc + s.totalUsd, 0); let b = salesHistory.reduce((acc, s) => acc + s.totalBs, 0);
-            document.getElementById('statsTotalUsd').innerText = `$${u.toFixed(2)}`;
-            document.getElementById('statsTotalBs').innerText = `Bs. ${b.toFixed(2)}`;
-            document.getElementById('statsCount').innerText = salesHistory.length;
+            document.getElementById('statsTotalUsd').innerText = `$${u.toFixed(2)}`; document.getElementById('statsTotalBs').innerText = `Bs. ${b.toFixed(2)}`; document.getElementById('statsCount').innerText = salesHistory.length;
             const methods = {}; salesHistory.forEach(s => { if (!methods[s.method]) methods[s.method] = { count: 0, usd: 0 }; methods[s.method].count++; methods[s.method].usd += s.totalUsd; });
             const mc = document.getElementById('statsByMethod'); mc.innerHTML = '';
             Object.keys(methods).forEach(m => {
